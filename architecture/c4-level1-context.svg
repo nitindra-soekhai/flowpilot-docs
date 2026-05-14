@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 580" font-family="Segoe UI, Arial, sans-serif">
+<defs>
+  <marker id="arr" viewBox="0 0 10 6" refX="9" refY="3" markerWidth="8" markerHeight="6" orient="auto">
+    <path d="M0,0 L10,3 L0,6 Z" fill="#555"/>
+  </marker>
+</defs>
+
+<!-- ── Title ──────────────────────────────────────────── -->
+<text x="650" y="28" font-size="14" font-weight="700" fill="#111" text-anchor="middle">FlowPilot — System Context (C4 Level 1)</text>
+
+<!-- ── Persons ─────────────────────────────────────────── -->
+<rect x="20" y="108" width="200" height="65" rx="32" fill="#08427B" stroke="#063560"/>
+<text x="120" y="135" font-size="11" fill="white" text-anchor="middle" font-weight="600">Onboarding Coordinator</text>
+<text x="120" y="151" font-size="9.5" fill="#acd" text-anchor="middle">Initiates · tracks onboarding</text>
+
+<rect x="20" y="243" width="200" height="65" rx="32" fill="#08427B" stroke="#063560"/>
+<text x="120" y="270" font-size="11" fill="white" text-anchor="middle" font-weight="600">Approver</text>
+<text x="120" y="286" font-size="9.5" fill="#acd" text-anchor="middle">Procurement · Security · Legal</text>
+
+<rect x="20" y="378" width="200" height="65" rx="32" fill="#08427B" stroke="#063560"/>
+<text x="120" y="405" font-size="11" fill="white" text-anchor="middle" font-weight="600">Vendor</text>
+<text x="120" y="421" font-size="9.5" fill="#acd" text-anchor="middle">External supplier</text>
+
+<!-- ── FlowPilot Platform ─────────────────────────────── -->
+<rect x="290" y="52" width="440" height="478" rx="10" fill="#1168BD" stroke="#0E55A0" stroke-width="1.5"/>
+<text x="510" y="265" font-size="18" fill="white" text-anchor="middle" font-weight="700">FlowPilot Platform</text>
+<text x="510" y="288" font-size="11.5" fill="#b8d4f0" text-anchor="middle">AI-assisted vendor onboarding</text>
+<text x="510" y="307" font-size="10.5" fill="#cde" text-anchor="middle">Guidance · Workflow execution</text>
+<text x="510" y="323" font-size="10.5" fill="#cde" text-anchor="middle">Approval orchestration · Compliance coordination</text>
+
+<!-- ── AI Services group ──────────────────────────────── -->
+<rect x="778" y="68" width="179" height="210" rx="6" fill="none" stroke="#aaa" stroke-width="1" stroke-dasharray="5,3"/>
+<text x="867" y="83" font-size="10" fill="#888" text-anchor="middle" font-style="italic">AI Services</text>
+
+<rect x="788" y="90" width="159" height="70" rx="5" fill="#707070" stroke="#595959"/>
+<text x="867" y="118" font-size="11" fill="white" text-anchor="middle" font-weight="600">OpenAI API</text>
+<text x="867" y="134" font-size="9.5" fill="#ddd" text-anchor="middle">GPT-4o · Embeddings</text>
+<text x="867" y="148" font-size="9" fill="#ccc" text-anchor="middle">text-embedding-3-small</text>
+
+<rect x="788" y="174" width="159" height="70" rx="5" fill="#707070" stroke="#595959"/>
+<text x="867" y="202" font-size="11" fill="white" text-anchor="middle" font-weight="600">Qdrant</text>
+<text x="867" y="218" font-size="9.5" fill="#ddd" text-anchor="middle">Vector store</text>
+<text x="867" y="232" font-size="9" fill="#ccc" text-anchor="middle">Policy embeddings</text>
+
+<!-- ── Enterprise Systems group ──────────────────────── -->
+<rect x="778" y="292" width="179" height="238" rx="6" fill="none" stroke="#aaa" stroke-width="1" stroke-dasharray="5,3"/>
+<text x="867" y="307" font-size="10" fill="#888" text-anchor="middle" font-style="italic">Enterprise Systems</text>
+
+<rect x="788" y="314" width="159" height="40" rx="5" fill="#707070" stroke="#595959"/>
+<text x="867" y="338" font-size="10.5" fill="white" text-anchor="middle" font-weight="600">Procurement Platform</text>
+
+<rect x="788" y="362" width="159" height="40" rx="5" fill="#707070" stroke="#595959"/>
+<text x="867" y="386" font-size="10.5" fill="white" text-anchor="middle" font-weight="600">Ticketing System</text>
+
+<rect x="788" y="410" width="159" height="40" rx="5" fill="#707070" stroke="#595959"/>
+<text x="867" y="434" font-size="10.5" fill="white" text-anchor="middle" font-weight="600">HR System</text>
+
+<rect x="788" y="458" width="159" height="40" rx="5" fill="#707070" stroke="#595959"/>
+<text x="867" y="482" font-size="10.5" fill="white" text-anchor="middle" font-weight="600">Email · Notifications</text>
+
+<rect x="788" y="506" width="159" height="40" rx="5" fill="#707070" stroke="#595959"/>
+<text x="867" y="530" font-size="10.5" fill="white" text-anchor="middle" font-weight="600">Compliance System</text>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- ARROWS — all routed through white space             -->
+<!-- ════════════════════════════════════════════════════ -->
+<g stroke="#555" stroke-width="1.4" fill="none" marker-end="url(#arr)">
+  <!-- Persons → FlowPilot (diagonals, left to right, no crossings) -->
+  <path d="M220,140 L290,182"/>
+  <path d="M220,275 L290,291"/>
+  <path d="M220,410 L290,394"/>
+
+  <!-- FlowPilot → External (all horizontal, exit right at x=730) -->
+  <path d="M730,125 H788"/>
+  <path d="M730,209 H788"/>
+  <path d="M730,334 H788"/>
+  <path d="M730,382 H788"/>
+  <path d="M730,430 H788"/>
+  <path d="M730,478 H788"/>
+  <path d="M730,526 H788"/>
+</g>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- LABELS                                              -->
+<!-- ════════════════════════════════════════════════════ -->
+<g font-size="9" fill="#000" text-anchor="middle" paint-order="stroke" stroke="white" stroke-width="3.5" stroke-linejoin="round">
+
+  <!-- Person → FlowPilot labels (in white gap x=220-290) -->
+  <text x="255" y="153">Start onboarding, track status</text>
+  <text x="255" y="163" font-size="8" fill="#000">HTTPS</text>
+
+  <text x="255" y="277">Review and approve</text>
+  <text x="255" y="287" font-size="8" fill="#000">HTTPS</text>
+
+  <text x="255" y="395">Submit documentation and questionnaires</text>
+  <text x="255" y="405" font-size="8" fill="#000">HTTPS</text>
+
+  <!-- FlowPilot → External labels (in gap x=730-788, centered at x=759) -->
+  <text x="759" y="120" font-size="8.5">HTTPS</text>
+  <text x="759" y="204" font-size="8.5">gRPC</text>
+  <text x="759" y="329" font-size="8.5">REST</text>
+  <text x="759" y="377" font-size="8.5">REST</text>
+  <text x="759" y="425" font-size="8.5">REST</text>
+  <text x="759" y="473" font-size="8.5">SMTP/REST</text>
+  <text x="759" y="521" font-size="8.5">REST</text>
+
+</g>
+
+<!-- ── Footer ────────────────────────────────────────── -->
+<text x="650" y="562" font-size="9" fill="#bbb" text-anchor="middle" font-style="italic">FlowPilot Platform boundary — internal containers and components detailed in C4 Level 2 and 3</text>
+
+</svg>

@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 680" font-family="Segoe UI, Arial, sans-serif">
+<defs>
+  <marker id="arr" viewBox="0 0 10 6" refX="9" refY="3" markerWidth="8" markerHeight="6" orient="auto">
+    <path d="M0,0 L10,3 L0,6 Z" fill="#555"/>
+  </marker>
+</defs>
+
+<!-- ── Title ──────────────────────────────────────────── -->
+<text x="650" y="30" font-size="14" font-weight="700" fill="#111" text-anchor="middle">FlowPilot — Container Diagram (C4 Level 2)</text>
+
+<!-- ── Enterprise systems group ──────────────────────── -->
+<rect x="4" y="192" width="172" height="334" rx="6" fill="none" stroke="#aaa" stroke-width="1" stroke-dasharray="5,3"/>
+<text x="90" y="207" font-size="10" fill="#888" text-anchor="middle" font-style="italic">Enterprise Systems</text>
+<rect x="10" y="210" width="165" height="50" rx="5" fill="#707070" stroke="#595959"/>
+<text x="92" y="229" font-size="11" fill="white" text-anchor="middle" font-weight="600">Procurement Platform</text>
+<text x="92" y="245" font-size="9.5" fill="#ddd" text-anchor="middle">Supplier records · POs</text>
+<rect x="10" y="272" width="165" height="50" rx="5" fill="#707070" stroke="#595959"/>
+<text x="92" y="291" font-size="11" fill="white" text-anchor="middle" font-weight="600">Ticketing System</text>
+<text x="92" y="307" font-size="9.5" fill="#ddd" text-anchor="middle">Tasks · escalations</text>
+<rect x="10" y="334" width="165" height="50" rx="5" fill="#707070" stroke="#595959"/>
+<text x="92" y="353" font-size="11" fill="white" text-anchor="middle" font-weight="600">HR System</text>
+<text x="92" y="369" font-size="9.5" fill="#ddd" text-anchor="middle">Identity · org structure</text>
+<rect x="10" y="396" width="165" height="50" rx="5" fill="#707070" stroke="#595959"/>
+<text x="92" y="415" font-size="11" fill="white" text-anchor="middle" font-weight="600">Email · Notifications</text>
+<text x="92" y="431" font-size="9.5" fill="#ddd" text-anchor="middle">Alerts · status updates</text>
+<rect x="10" y="458" width="165" height="50" rx="5" fill="#707070" stroke="#595959"/>
+<text x="92" y="477" font-size="11" fill="white" text-anchor="middle" font-weight="600">Compliance System</text>
+<text x="92" y="493" font-size="9.5" fill="#ddd" text-anchor="middle">Policies · risk registers</text>
+
+<!-- ── OpenAI ─────────────────────────────────────────── -->
+<rect x="1125" y="175" width="130" height="90" rx="5" fill="#707070" stroke="#595959"/>
+<text x="1190" y="207" font-size="11" fill="white" text-anchor="middle" font-weight="600">OpenAI API</text>
+<text x="1190" y="223" font-size="9.5" fill="#ddd" text-anchor="middle">GPT-4o · Completion</text>
+<text x="1190" y="239" font-size="9.5" fill="#ddd" text-anchor="middle">text-embedding-3-small</text>
+
+<!-- ── Platform boundary ──────────────────────────────── -->
+<rect x="215" y="148" width="870" height="460" rx="8" fill="#EEF3FB" stroke="#185FA5" stroke-width="1.5" stroke-dasharray="8,4"/>
+<text x="650" y="170" font-size="12" fill="#185FA5" text-anchor="middle" font-weight="600" font-style="italic">FlowPilot Platform</text>
+
+<!-- ── IntegrationAdapter ─────────────────────────────── -->
+<rect x="230" y="186" width="185" height="105" rx="6" fill="#1168BD" stroke="#0E55A0"/>
+<text x="322" y="216" font-size="12" fill="white" text-anchor="middle" font-weight="700">IntegrationAdapter</text>
+<text x="322" y="232" font-size="9.5" fill="#b8d4f0" text-anchor="middle">Python · FastAPI · :8002</text>
+<text x="322" y="248" font-size="9" fill="#cde" text-anchor="middle">Single seam — all enterprise</text>
+<text x="322" y="262" font-size="9" fill="#cde" text-anchor="middle">integrations · stubbed</text>
+
+<!-- ── vendor-onboarding ──────────────────────────────── -->
+<rect x="462" y="186" width="222" height="105" rx="6" fill="#1168BD" stroke="#0E55A0"/>
+<text x="573" y="213" font-size="11.5" fill="white" text-anchor="middle" font-weight="700">vendor-onboarding</text>
+<text x="573" y="229" font-size="9.5" fill="#b8d4f0" text-anchor="middle">Python · FastAPI · LangGraph · :8001</text>
+<text x="573" y="246" font-size="9" fill="#cde" text-anchor="middle">Onboarding workflow execution</text>
+<text x="573" y="260" font-size="9" fill="#cde" text-anchor="middle">HITL approval gateway</text>
+
+<!-- ── rag-service ────────────────────────────────────── -->
+<rect x="732" y="186" width="202" height="105" rx="6" fill="#1168BD" stroke="#0E55A0"/>
+<text x="833" y="213" font-size="11.5" fill="white" text-anchor="middle" font-weight="700">rag-service</text>
+<text x="833" y="229" font-size="9.5" fill="#b8d4f0" text-anchor="middle">Python · FastAPI · LangChain · :8000</text>
+<text x="833" y="246" font-size="9" fill="#cde" text-anchor="middle">Policy retrieval</text>
+<text x="833" y="260" font-size="9" fill="#cde" text-anchor="middle">Hybrid dense + sparse search</text>
+
+<!-- ── RBAC ───────────────────────────────────────────── -->
+<rect x="403" y="410" width="190" height="80" rx="6" fill="#1168BD" stroke="#0E55A0"/>
+<text x="498" y="438" font-size="11.5" fill="white" text-anchor="middle" font-weight="700">RBAC Middleware</text>
+<text x="498" y="454" font-size="9.5" fill="#b8d4f0" text-anchor="middle">Python · Shared library</text>
+<text x="498" y="470" font-size="9" fill="#cde" text-anchor="middle">JWT decode · permission enforce</text>
+
+<!-- ── SQLite ──────────────────────────────────────────── -->
+<rect x="623" y="410" width="140" height="80" rx="6" fill="#1168BD" stroke="#0E55A0"/>
+<text x="693" y="440" font-size="11.5" fill="white" text-anchor="middle" font-weight="700">SQLite</text>
+<text x="693" y="456" font-size="9.5" fill="#b8d4f0" text-anchor="middle">SQLite · file</text>
+<text x="693" y="472" font-size="9" fill="#cde" text-anchor="middle">Workflow state · Audit log</text>
+
+<!-- ── Qdrant ──────────────────────────────────────────── -->
+<rect x="793" y="410" width="162" height="80" rx="6" fill="#1168BD" stroke="#0E55A0"/>
+<text x="874" y="440" font-size="11.5" fill="white" text-anchor="middle" font-weight="700">Qdrant</text>
+<text x="874" y="456" font-size="9.5" fill="#b8d4f0" text-anchor="middle">Vector database · :6333</text>
+<text x="874" y="472" font-size="9" fill="#cde" text-anchor="middle">Policy embeddings</text>
+
+<!-- ── Persons ─────────────────────────────────────────── -->
+<rect x="370" y="52" width="188" height="65" rx="32" fill="#08427B" stroke="#063560"/>
+<text x="464" y="79" font-size="11" fill="white" text-anchor="middle" font-weight="600">Onboarding Coordinator</text>
+<text x="464" y="95" font-size="9.5" fill="#acd" text-anchor="middle">Initiates · tracks onboarding</text>
+
+<rect x="578" y="52" width="160" height="65" rx="32" fill="#08427B" stroke="#063560"/>
+<text x="658" y="79" font-size="11" fill="white" text-anchor="middle" font-weight="600">Approver</text>
+<text x="658" y="95" font-size="9.5" fill="#acd" text-anchor="middle">Procurement · Security · Legal</text>
+
+<rect x="760" y="52" width="140" height="65" rx="32" fill="#08427B" stroke="#063560"/>
+<text x="830" y="79" font-size="11" fill="white" text-anchor="middle" font-weight="600">Vendor</text>
+<text x="830" y="95" font-size="9.5" fill="#acd" text-anchor="middle">External supplier</text>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- ARROWS                                              -->
+<!-- ════════════════════════════════════════════════════ -->
+<g stroke="#555" stroke-width="1.4" fill="none" marker-end="url(#arr)">
+  <!-- Persons → VO -->
+  <path d="M464,117 L513,186"/>
+  <path d="M658,117 L573,186"/>
+  <path d="M830,117 L640,186"/>
+  <!-- VO → adapter -->
+  <path d="M462,238 H415"/>
+  <!-- adapter → Enterprise (routing lane x=206) -->
+  <path d="M231,222 H206 V235 H175"/>
+  <path d="M231,230 H206 V297 H175"/>
+  <path d="M231,238 H206 V359 H175"/>
+  <path d="M231,246 H206 V421 H175"/>
+  <path d="M231,254 H206 V483 H175"/>
+  <!-- VO → rag -->
+  <path d="M684,238 H732"/>
+  <!-- VO → RBAC -->
+  <path d="M520,291 V335 H498 V410"/>
+  <!-- VO → SQLite -->
+  <path d="M550,291 V373 H693 V410"/>
+  <!-- rag → RBAC -->
+  <path d="M750,291 V330 H498 V410"/>
+  <!-- rag → SQLite -->
+  <path d="M820,291 V352 H713 V410"/>
+  <!-- rag → Qdrant -->
+  <path d="M874,291 V410"/>
+  <!-- rag → OpenAI -->
+  <path d="M934,238 H1125"/>
+</g>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- LABELS                                              -->
+<!-- ════════════════════════════════════════════════════ -->
+<g font-size="9" fill="#333" text-anchor="middle" paint-order="stroke" stroke="white" stroke-width="3.5" stroke-linejoin="round">
+
+  <!-- 1. Start onboarding · white strip above VO, near coord arrow arrival -->
+  <text x="476" y="163">Start onboarding, track status</text>
+  <text x="476" y="173" font-size="8" fill="#666">HTTPS</text>
+
+  <!-- 2. Review and approve · gap between persons and platform -->
+  <text x="624" y="133">Review and approve</text>
+  <text x="624" y="143" font-size="8" fill="#666">HTTPS</text>
+
+  <!-- 3. Submit documents · gap near vendor arrow -->
+  <text x="770" y="133">Submit documents and questionnaires</text>
+  <text x="770" y="143" font-size="8" fill="#666">HTTPS</text>
+
+  <!-- 4. Request enterprise operations · white strip above containers -->
+  <text x="437" y="178">Request enterprise operations</text>
+  <text x="437" y="188" font-size="8" fill="#666">HTTP REST</text>
+
+  <!-- 5. Read/write workflow state · inter-row space below VO→SQLite path -->
+  <text x="622" y="382">Read and write workflow state and audit log</text>
+  <text x="622" y="392" font-size="8" fill="#666">SQLite</text>
+
+  <!-- adapter → Enterprise -->
+  <text x="190" y="355" transform="rotate(-90,190,355)">REST ×5</text>
+
+  <!-- VO → RAG -->
+  <text x="708" y="232">REST</text>
+
+  <!-- VO → RBAC -->
+  <text x="533" y="312">in-process</text>
+
+  <!-- rag → RBAC -->
+  <text x="628" y="325">in-process</text>
+
+  <!-- rag → SQLite -->
+  <text x="770" y="347">SQLite</text>
+
+  <!-- rag → Qdrant -->
+  <text x="888" y="355">gRPC</text>
+
+  <!-- rag → OpenAI -->
+  <text x="1030" y="232">HTTPS</text>
+
+</g>
+
+<!-- ── Footer ────────────────────────────────────────── -->
+<text x="650" y="645" font-size="9" fill="#bbb" text-anchor="middle" font-style="italic">* OpenAI called by both services — rag-service (embeddings) · vendor-onboarding (completions) · see C4 L3 for detail</text>
+
+</svg>
