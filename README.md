@@ -104,6 +104,6 @@ uvicorn app.main:app --port 8001
 
 | Service | Status |
 |---|---|
-| flowpilot-rag-service | 🔜 Day 1 |
 | flowpilot-vendor-onboarding | 🔜 Day 2 |
+| flowpilot-rag-service | ✅ Day 1 |
 | Architecture docs | ✅ Day 0 complete |
