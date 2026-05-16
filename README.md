@@ -1,109 +1,108 @@
-# FlowPilot — Architecture Documentation
+# flowpilot-docs
 
-> AI-assisted enterprise vendor onboarding — portfolio project demonstrating senior AI architect capabilities.
+Architecture documentation for the FlowPilot AI Platform — a portfolio project demonstrating senior enterprise AI architect capabilities.
 
----
-
-## Assistance & Retrieval Architecture
-
-![FlowPilot Assistance & Retrieval Architecture](architecture/flowpilot-architecture.png)
-
-FlowPilot is implemented as an **assistive capability alongside a Workflow UI**. No AI impacts transactional flows directly — the AI layer retrieves, explains, and recommends; humans approve and act.
-
-### Two-phase design
-
-| Phase | What happens |
-|---|---|
-| **Phase 1 — Retrieval** | User query → Retriever API → hybrid search (vector + full-text) → ranked candidates → top 3–5 answers returned |
-| **Phase 2 — Explanation** | Retrieved policy context → Prompt Orchestrator → AI Guardrails → External LLM → grounded explanation with citations |
-
-### Admin ingestion flow
-
-Policy PDF uploaded by Admin → Policy Ingestion Service → Policy Parsing & Validation (LangChain) → Knowledge Administration → stored in Knowledge Store (Qdrant + PostgreSQL full-text index).
+> **Audience:** Hiring managers and peer architects evaluating architectural depth. This repo is the architecture interview before the interview. Read the ADRs first.
 
 ---
 
-## Tech stack
+## Architecture Overview
 
-| Layer | Technology |
-|---|---|
-| Frontend | Angular |
-| Backend | FastAPI · LangChain · LangGraph |
-| Vector store | Qdrant |
-| Full-text index | PostgreSQL Full-Text Index |
-| LLM | OpenAI GPT-4o (primary) · Gemini (reference) |
-| Integration | REST APIs |
-| Auth | JWT-based RBAC (shared middleware) |
-| State | SQLite (workflow state + audit log) |
+```mermaid
+flowchart TB
+    subgraph Users
+        PM[Procurement Manager]
+        SA[Security Approver]
+        ADM[Platform Admin]
+    end
+
+    subgraph flowpilot-vendor-onboarding ["flowpilot-vendor-onboarding · port 8001"]
+        API[FastAPI + RBAC + TraceMiddleware]
+        LG[LangGraph StateGraph\nINITIATED → DOCUMENTS_COLLECTED\n→ SECURITY_REVIEW → PENDING_APPROVAL\n→ APPROVED / REJECTED]
+        VDB[(SQLite\nworkflows · events\naudit_log · dead_letter)]
+    end
+
+    subgraph flowpilot-rag-service ["flowpilot-rag-service · port 8000"]
+        RAPI[FastAPI]
+        RET[Hybrid Retrieval\ndense + sparse · RRF fusion\nconfidence threshold · guardrails]
+        QDRANT[(Qdrant\nVector DB)]
+        RAG_DB[(SQLite\nretrieval audit)]
+    end
+
+    subgraph External
+        OAI[OpenAI API\nGPT-4o · text-embedding-3-large]
+    end
+
+    PM -->|POST /workflows/| API
+    SA -->|POST /workflows/id/decisions\nsecurity_approver JWT required| API
+    ADM -->|POST /ingest| RAPI
+
+    API --> LG
+    LG -->|Persists state after each node| VDB
+    LG -->|POST /query · X-Trace-ID propagated| RAPI
+
+    RAPI --> RET
+    RET <-->|gRPC| QDRANT
+    RET -->|Embed + generate| OAI
+    RET --> RAG_DB
+
+    style flowpilot-vendor-onboarding fill:#1e3a5f,color:#fff,stroke:#4a90d9
+    style flowpilot-rag-service fill:#1a4a2e,color:#fff,stroke:#4aad6e
+    style External fill:#4a2e1a,color:#fff,stroke:#d9844a
+```
+
+### Key architectural decisions at a glance
+
+- **Two services, not one** — RAG service is domain-agnostic and reusable. Vendor onboarding calls it over REST. See [ADR-007](./adr/ADR-007-retrieval-separated-from-orchestration.md).
+- **HITL is structural** — `security_approver` JWT required for decisions endpoint. Agent cannot self-approve. See [ADR-004](./adr/ADR-004-hitl-platform-concern.md).
+- **Hybrid retrieval** — dense + sparse vectors fused via reciprocal rank fusion. Exact regulatory codes retrieved reliably. See [ADR-002](./adr/ADR-002-hybrid-retrieval.md).
+- **Mock mode built in** — full workflow runs with `FP_MOCK_MODE=true`, zero API key, zero cost. See [ADR-009](./adr/ADR-009-mock-mode.md).
+
+---
+
+## Contents
+
+| Section | What it covers |
+|---------|---------------|
+| [Architecture](./architecture/) | C4 diagrams (Context, Container, Component), sequence diagrams (happy path, 2 failure paths, approval timeout), domain boundaries |
+| [ADRs](./adr/) | 11 Architecture Decision Records with genuine tradeoffs |
+| [Governance](./governance/) | AI action boundaries, HITL enforcement, auditability model |
+| [Demo Script](./demo/) | Step-by-step walkthrough of all three iterations |
 
 ---
 
 ## Repositories
 
-| Repo | Purpose |
-|---|---|
-| [`flowpilot-docs`](.) | Architecture documentation — all diagrams, models, ADRs |
-| [`flowpilot-rag-service`](https://github.com/nitindra-soekhai/flowpilot-rag-service) | Policy ingestion, hybrid retrieval, grounding, guardrails |
-| [`flowpilot-vendor-onboarding`](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding) | Onboarding workflow, LangGraph agent, HITL approval gateway |
+| Repository | Purpose | Status |
+|-----------|---------|--------|
+| `flowpilot-rag-service` | Document ingestion, hybrid retrieval, grounding, guardrails | ✅ v0.1-mvp, v0.3-iteration-2 |
+| `flowpilot-vendor-onboarding` | LangGraph orchestration, HITL approval, workflow state | ✅ v0.2-iteration-1, v0.3-iteration-2 |
+| `flowpilot-docs` | This repo — architecture, ADRs, governance | ✅ Active |
+| `flowpilot-platform` | Reusable platform layer — RBAC, audit, HITL interfaces | 🔄 In progress |
+| `flowpilot-infra` | Terraform, Kubernetes, GitHub Actions CI/CD | 🔄 In progress |
+| `flowpilot-ui` | React operational dashboard | 🔄 In progress |
 
 ---
 
-## Architecture documents
+## Release History
 
-| Artifact | File |
-|---|---|
-| C4 Level 1 — System context | [`architecture/c4-level1-context.md`](architecture/c4-level1-context.md) |
-| C4 Level 2 — Container diagram | [`architecture/c4-level2-containers.md`](architecture/c4-level2-containers.md) |
-| C4 Level 3 — RAG service components | [`architecture/c4-level3-rag-service.md`](architecture/c4-level3-rag-service.md) |
-| C4 Level 3 — Vendor onboarding components | [`architecture/c4-level3-vendor-onboarding.md`](architecture/c4-level3-vendor-onboarding.md) |
-| Information model | [`architecture/information-model.md`](architecture/information-model.md) |
-| Data model — SQLite + Qdrant | [`architecture/data-model.md`](architecture/data-model.md) |
-| RBAC role matrix + enforcement | [`architecture/rbac.md`](architecture/rbac.md) |
-| Happy path sequence diagram | [`architecture/happy-path-sequence.md`](architecture/happy-path-sequence.md) |
-| Deployment — Docker + Azure reference | [`architecture/deployment.md`](architecture/deployment.md) |
-| ADR-010 — RBAC decision | [`architecture/adr/ADR-010-rbac.md`](architecture/adr/ADR-010-rbac.md) |
+| Release | What it demonstrates |
+|---------|---------------------|
+| `v1.0-final` | Complete platform, live OpenAI, E2E tests, full documentation |
+| `v0.3-iteration-2` | Operational resilience, retry, dead-letter, degraded mode, guardrails |
+| `v0.2-iteration-1` | LangGraph agentic workflow, HITL approval gate, cross-service tracing |
+| `v0.1-mvp` | RAG service, observability foundation, audit log, 58 unit tests |
 
 ---
 
-## Design principles
+## Start here
 
-- **Governed AI** — every AI action is auditable, permission-aware, and explainable
-- **Human-in-the-loop** — approvals are always human; the agent cannot self-approve
-- **Agent permission boundary** — an agent cannot exceed the permissions of the user who triggered it (ADR-010)
-- **Mock-first** — full architecture runs without an OpenAI key; mock mode enables local development and testing
-- **Retrieval-grounded** — all AI recommendations are cited against specific policy clauses; no hallucinated guidance
+If you have **10 minutes**: read [ADR-007](./adr/ADR-007-retrieval-separated-from-orchestration.md) (why two services) and [ADR-004](./adr/ADR-004-hitl-platform-concern.md) (why HITL is a platform concern). These two decisions explain the entire architecture.
 
----
+If you have **30 minutes**: read all ADRs, then [c4-container](./architecture/c4-container.md) and [sequence-happy-path](./architecture/sequence-happy-path.md).
 
-## Local setup
-
-```bash
-# Prerequisites: Docker running, Qdrant image pulled, Python 3.11+
-
-# Clone all repos
-git clone https://github.com/nitindra-soekhai/flowpilot-rag-service
-git clone https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding
-
-# Start Qdrant
-docker run -p 6333:6333 qdrant/qdrant
-
-# RAG service
-cd flowpilot-rag-service
-pip install -r requirements.txt
-uvicorn app.main:app --port 8000
-
-# Vendor onboarding service
-cd flowpilot-vendor-onboarding
-pip install -r requirements.txt
-uvicorn app.main:app --port 8001
-```
+If you want to **run it**: see [demo-script](./demo/demo-script.md).
 
 ---
 
-## Build status
-
-| Service | Status |
-|---|---|
-| flowpilot-vendor-onboarding | 🔜 Day 2 |
-| flowpilot-rag-service | ✅ Day 1 complete  |
-| Architecture docs | ✅ Day 0 complete |
+*FlowPilot · NSCS B.V. · May 2026*
