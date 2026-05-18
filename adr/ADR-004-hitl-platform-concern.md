@@ -1,6 +1,9 @@
 # ADR-004 — HITL as Platform-Level Concern
 
 **Status:** Accepted — May 2026  
+
+**Layer:** 🟣 Agentic AI
+> HITL is a governance boundary within the agentic workflow. The LangGraph agent pauses at the request_approval node and waits for a human decision. RAG is stateless and has no HITL concept.
 **Deciders:** Nitin Soekhai (NSCS B.V.)
 
 ---

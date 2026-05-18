@@ -1,6 +1,9 @@
 # ADR-002 — Hybrid Retrieval over Dense-Only
 
 **Status:** Accepted — May 2026  
+
+**Layer:** 🔵 RAG
+> Retrieval strategy decision within flowpilot-rag-service. The agentic layer calls POST /query and receives results; it has no knowledge of dense or sparse vectors.
 **Deciders:** Nitin Soekhai (NSCS B.V.)
 
 ---

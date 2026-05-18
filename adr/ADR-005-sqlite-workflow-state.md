@@ -1,6 +1,9 @@
 # ADR-005 — SQLite for Workflow State
 
 **Status:** Accepted — May 2026, revisit at production scope  
+
+**Layer:** 🟣 Agentic AI
+> Workflow state persistence is an agentic concern. The agent must remember where it is in the multi-step process across the HITL suspension. The RAG service is stateless and uses no persistent state store.
 **Deciders:** Nitin Soekhai (NSCS B.V.)
 
 ---

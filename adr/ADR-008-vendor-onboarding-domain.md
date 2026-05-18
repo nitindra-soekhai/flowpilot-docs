@@ -1,6 +1,9 @@
 # ADR-008 — Vendor Onboarding as Demonstration Domain
 
 **Status:** Accepted — May 2026  
+
+**Layer:** 🟢 Shared — RAG + Agentic AI
+> The domain choice affects both layers. The RAG service ingests vendor onboarding policy documents. The agentic layer orchestrates the vendor onboarding workflow.
 **Deciders:** Nitin Soekhai (NSCS B.V.)
 
 ---

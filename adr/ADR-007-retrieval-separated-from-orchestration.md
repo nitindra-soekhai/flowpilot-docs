@@ -1,6 +1,9 @@
 # ADR-007 — Retrieval Service Separated from Orchestration
 
 **Status:** Accepted — May 2026  
+
+**Layer:** 🟡 Boundary decision — defines the RAG ↔ Agentic AI split
+> RAG lives in flowpilot-rag-service. Agentic orchestration lives in flowpilot-vendor-onboarding. The agent calls RAG as a tool over HTTP — POST /query with Bearer token. Neither service has a compile-time dependency on the other.
 **Deciders:** Nitin Soekhai (NSCS B.V.)
 
 ---

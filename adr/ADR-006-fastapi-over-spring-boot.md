@@ -1,6 +1,9 @@
 # ADR-006 — FastAPI over Spring Boot
 
 **Status:** Accepted — May 2026, portfolio-scoped  
+
+**Layer:** 🟢 Shared — RAG + Agentic AI
+> Both flowpilot-rag-service and flowpilot-vendor-onboarding use FastAPI. The framework decision applies to the entire backend.
 **Deciders:** Nitin Soekhai (NSCS B.V.)
 
 ---

@@ -1,6 +1,9 @@
 # ADR-009 — Mock Mode for Zero-Friction Demonstration
 
 **Status:** Accepted — May 2026  
+
+**Layer:** 🟢 Shared — RAG + Agentic AI
+> FP_MOCK_MODE=true bypasses OpenAI calls in the RAG service (mock retrieved chunks) and in the agentic layer (mock security findings). Note: in flowpilot-vendor-onboarding, FP_MOCK_MODE=true also bypasses Keycloak JWKS validation — set to false for real authentication.
 **Deciders:** Nitin Soekhai (NSCS B.V.)
 
 ---

@@ -1,6 +1,9 @@
 # ADR-012 — Keycloak as Identity Provider
 
 **Status:** Accepted — May 2026
+
+**Layer:** 🟢 Shared — RAG + Agentic AI
+> Both backend services (RAG and Agentic AI) validate Keycloak JWTs via the JWKS endpoint. Role-based access controls which workflow actions the agentic layer may execute and which queries the RAG service will serve.
 **Author:** Nitindra Soekhai, NSCS B.V.
 **Supersedes:** Portfolio HS256 hardcoded JWT tokens (ADR-010 partial)
 

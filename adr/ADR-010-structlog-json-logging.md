@@ -1,6 +1,9 @@
 # ADR-010 — Structured JSON Logging over Traditional Logging
 
 **Status:** Accepted — May 2026  
+
+**Layer:** 🟢 Shared — RAG + Agentic AI
+> structlog JSON logging applies to both services. The RAG service logs retrieval metrics (chunk scores, latency, confidence_met). The agentic layer logs workflow state transitions and 11 audit event types. Both share trace_id format for cross-service correlation.
 **Deciders:** Nitin Soekhai (NSCS B.V.)
 
 ---

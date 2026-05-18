@@ -1,6 +1,9 @@
 # ADR-001 — Qdrant over PostgreSQL pgvector
 
 **Status:** Accepted — May 2026  
+
+**Layer:** 🔵 RAG
+> Applies to flowpilot-rag-service. The vector store is only accessed by the retrieval pipeline — the agentic layer never calls Qdrant directly.
 **Deciders:** Nitin Soekhai (NSCS B.V.)
 
 ---

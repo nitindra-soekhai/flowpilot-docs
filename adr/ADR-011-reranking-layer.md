@@ -1,6 +1,9 @@
 # ADR-011 — No Dedicated Reranking Layer at Portfolio Scope
 
 **Status:** Accepted — May 2026, revisit at production scale  
+
+**Layer:** 🔵 RAG
+> Reranking is a retrieval quality concern within the RAG pipeline. The agentic layer is unaffected — it receives retrieval results regardless of whether a reranking step is present.
 **Deciders:** Nitin Soekhai (NSCS B.V.)
 
 ---

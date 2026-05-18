@@ -1,6 +1,9 @@
 # ADR-003 — LangGraph Restricted to Domain Layer
 
 **Status:** Accepted — May 2026  
+
+**Layer:** 🟣 Agentic AI
+> LangGraph is the orchestration engine for the vendor assessment state machine in flowpilot-vendor-onboarding. The RAG service does not use LangGraph.
 **Deciders:** Nitin Soekhai (NSCS B.V.)
 
 ---
