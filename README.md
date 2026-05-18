@@ -6,6 +6,35 @@
 
 **The vendor onboarding workflow is the demonstration domain. FlowPilot is the platform.**
 
+![CI](https://github.com/nitindra-soekhai/flowpilot-rag-service/actions/workflows/ci.yml/badge.svg?branch=dev)
+![Tests](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding/actions/workflows/ci.yml/badge.svg?branch=dev)
+
+---
+
+## Engineering Proof
+
+| Signal | Evidence |
+|---|---|
+| **Tests** | `pytest` — RAG pipeline, LangGraph nodes, HITL logic, RBAC enforcement, retry/dead-letter |
+| **15 issues resolved** | Docker networking, OIDC chain, role extraction, UI/API mismatches — all documented with root cause and fix |
+| **Observability is live** | 11 structured audit events visible in the running UI — not mocked, called from real API |
+| **Auth is real** | Keycloak JWKS JWT validation with RSA key verification — not hardcoded tokens |
+| **Resilience is tested** | Retry, dead-letter, degraded mode manually triggered and verified against running services |
+| **CI** | GitHub Actions: build, test, docker push on every commit to dev |
+
+---
+
+## Known Limitations & Tradeoffs
+
+> Stated openly — senior engineers trust people who understand their own constraints.
+
+- **SQLite** — accepted at portfolio scope. PostgreSQL is the documented production path; migration is config-only, no application code changes (ADR-005)
+- **No reranking layer** — hybrid RRF sufficient at this corpus size. Cross-encoder reranking is the documented upgrade path at scale (ADR-011)
+- **No load testing** — not fabricated. Concurrency and throughput testing planned before productionisation
+- **AKS deployment** — documented production target, not yet automated. Terraform + Kubernetes manifests are the next infrastructure milestone
+- **Evaluation framework** — retrieval scoring (`avg_score`, `confidence_met`, `latency_ms`) visible in the audit trail. Formal LLM output evaluation pipeline is planned
+- **Intentionally optimises clarity over scale** — this is a portfolio demonstrating architectural thinking. Production hardening is the documented next phase, not a gap in understanding
+
 ---
 
 ## Why This Architecture?
