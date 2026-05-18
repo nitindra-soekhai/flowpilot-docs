@@ -68,45 +68,50 @@ The screenshots below show the complete end-to-end flow across both user roles. 
 
 FlowPilot demonstrates two enterprise AI patterns that serve different purposes and live in different repositories:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│              flowpilot-rag-service  (port 8000)          │
-│  ┌──────────┐  ┌─────────────┐  ┌────────────────────┐  │
-│  │ Ingest   │  │   Qdrant    │  │  Grounding         │  │
-│  │ PDF →    │→ │ dense+sparse│→ │  Pipeline          │  │
-│  │ chunk →  │  │ hybrid RRF  │  │  + AI Guardrails   │  │
-│  │ embed    │  │  retrieval  │  │  (cite or block)   │  │
-│  └──────────┘  └─────────────┘  └────────────────────┘  │
-│  Stateless · Domain-agnostic · Reusable across domains   │
-└───────────────────────┬─────────────────────────────────┘
-                        │ HTTP POST /query (Bearer token)
-                        ▼
-┌─────────────────────────────────────────────────────────┐
-│         flowpilot-vendor-onboarding  (port 8001)         │
-│                                                          │
-│   collect_vendor_info                                    │
-│         │                                               │
-│         ▼                                               │
-│   retrieve_policies ──► calls RAG service               │
-│         │                                               │
-│         ▼                                               │
-│   assess_risk       ──► OpenAI security analysis        │
-│         │                                               │
-│         ▼                                               │
-│   request_approval  ──► HITL GATE (agent pauses)        │
-│         │               human decision required         │
-│         ▼                                               │
-│   complete          ──► audit events written            │
-│                                                          │
-│  Stateful · LangGraph · SQLite state · 11 audit events  │
-└─────────────────────────────────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────────┐
-│              flowpilot-ui  (port 3000)                   │
-│  React 18 · Vite · Tailwind · Keycloak OIDC              │
-│  9 scenes · Role-aware · Real-time audit trail           │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    UI(["🖥️ FlowPilot UI\nReact 18 · Vite · Tailwind · Port 3000"])
+    KC(["🔐 Keycloak 24\nOIDC Identity Provider · Port 8080"])
+
+    UI -- "OIDC Auth Code Flow" --> KC
+    KC -- "JWT Bearer Token" --> UI
+
+    subgraph RAG ["🔵 RAG Paradigm — flowpilot-rag-service · Port 8000 · Stateless · Domain-agnostic"]
+        direction LR
+        INGEST["📄 PDF Ingest\nLangChain loader + splitter"]
+        EMBED["🧮 OpenAI\ntext-embedding-3-large"]
+        QDRANT[("🗄️ Qdrant\nDense + Sparse Vectors")]
+        HYBRID["⚡ Hybrid RRF Fusion\n0.7 dense · 0.3 sparse"]
+        CONF{"Confidence Gate\navg_score ≥ 0.65"}
+        GUARD["🛡️ Grounding Pipeline\n+ AI Guardrails"]
+        BLOCKED(["❌ Blocked\nLow confidence"])
+
+        INGEST --> EMBED --> QDRANT
+        QDRANT --> HYBRID --> CONF
+        CONF -- "✓ pass" --> GUARD
+        CONF -- "✗ fail" --> BLOCKED
+    end
+
+    subgraph AGENT ["🟣 Agentic AI Paradigm — flowpilot-vendor-onboarding · Port 8001 · Stateful · LangGraph"]
+        direction TB
+        N1["collect_vendor_info"]
+        N2["retrieve_policies"]
+        N3["assess_risk\nOpenAI GPT-4o"]
+        N4[/"⏸️ request_approval\nHITL GATE — agent pauses"/]
+        N5(["✅ complete\n11 audit events · SQLite state"])
+
+        N1 --> N2 --> N3 --> N4
+        N4 -- "Human decision required" --> N5
+    end
+
+    OAI(["🤖 OpenAI Platform\nGPT-4o · text-embedding-3-large"])
+
+    UI -- "POST /workflows/ + Bearer" --> AGENT
+    UI -- "POST /query + Bearer" --> GUARD
+    N2 -- "POST /query" --> GUARD
+    GUARD -- "grounded response + avg_score + trace_id" --> N2
+    N3 --> OAI
+    EMBED --> OAI
 ```
 
 ### Architecture Diagrams
@@ -127,26 +132,47 @@ Every request through FlowPilot carries a `trace_id` generated at the API bounda
 
 ### Trace Flow
 
-```
-User Request
-    │
-    ├── trace_id: "a3f8-..." generated at API gateway
-    │
-    ├── RAG Service: POST /query
-    │   ├── trace_id propagated in X-Trace-ID header
-    │   ├── rag.query.initiated   { trace_id, query, timestamp }
-    │   └── rag.query.completed   { trace_id, avg_score, confidence_met, results_count, latency_ms }
-    │
-    ├── Vendor Onboarding Agent: LangGraph nodes
-    │   ├── workflow.created      { trace_id, workflow_id, requester, vendor_name }
-    │   ├── security.analysis.started   { trace_id, workflow_id }
-    │   ├── security.findings.generated { trace_id, risk_level, findings }
-    │   ├── workflow.routed       { trace_id, approver_role }
-    │   ├── approval.decision.submitted { trace_id, decision, approver }
-    │   └── workflow.completed    { trace_id, outcome }
-    │
-    └── Audit Trail: GET /workflows/{id}/events
-        └── Returns all 11 event types correlated by trace_id
+```mermaid
+sequenceDiagram
+    actor Sarah as 👤 sarah.chen<br/>(procurement_manager)
+    actor Michael as 👤 michael.davidson<br/>(security_approver)
+    participant UI as FlowPilot UI
+    participant KC as Keycloak 24
+    participant AGENT as vendor-onboarding<br/>LangGraph Agent
+    participant RAG as rag-service<br/>Hybrid Retrieval
+    participant OAI as OpenAI<br/>GPT-4o
+
+    Sarah->>KC: Login (OIDC Auth Code Flow)
+    KC-->>UI: JWT Bearer · role: procurement_manager
+
+    Sarah->>UI: Submit vendor onboarding request
+    UI->>AGENT: POST /workflows/ + Bearer JWT
+    Note over AGENT: ✦ trace_id generated<br/>📋 workflow.created emitted
+
+    AGENT->>RAG: POST /query + X-Trace-ID header
+    Note over RAG: 📋 rag.query.initiated emitted
+    RAG->>OAI: Embed query (text-embedding-3-large)
+    OAI-->>RAG: Dense vector
+    Note over RAG: Hybrid RRF fusion · confidence gate
+    RAG-->>AGENT: Grounded response + avg_score + trace_id
+    Note over RAG: 📋 rag.query.completed emitted<br/>avg_score · confidence_met · latency_ms
+
+    AGENT->>OAI: GPT-4o · security risk assessment
+    Note over AGENT: 📋 security.analysis.started emitted
+    OAI-->>AGENT: Risk level + findings
+    Note over AGENT: 📋 security.findings.generated emitted<br/>📋 workflow.routed emitted
+
+    Note over AGENT: ⏸ HITL GATE — agent pauses<br/>awaiting human decision
+
+    Michael->>KC: Login (account switch)
+    KC-->>UI: JWT Bearer · role: security_approver
+    Michael->>UI: View approval queue
+    UI->>AGENT: POST /workflows/{id}/approve + Bearer
+    Note over AGENT: 📋 approval.decision.submitted emitted<br/>📋 workflow.completed emitted
+
+    Sarah->>UI: View audit trail
+    UI->>AGENT: GET /workflows/{id}/events + Bearer
+    AGENT-->>UI: 11 events · all correlated by trace_id
 ```
 
 ### Structured Log Example
