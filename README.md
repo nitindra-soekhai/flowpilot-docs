@@ -219,38 +219,77 @@ flowchart TD
 
 > **Current scope:** Local Docker Compose. The production architecture below documents the target deployment — demonstrating infrastructure thinking beyond the portfolio implementation.
 
-```
-Internet → Azure API Management (APIM)
-                │
-                ├── /api/rag/*      → flowpilot-rag-service        (AKS pod)
-                ├── /api/workflow/* → flowpilot-vendor-onboarding   (AKS pod)
-                └── /auth/*         → Keycloak 24                   (AKS pod)
+```mermaid
+flowchart TB
+    Browser(["🌐 Browser / React UI"])
 
-AKS Cluster (flowpilot namespace)
-├── flowpilot-rag-service         (2 replicas, HPA on CPU/memory)
-├── flowpilot-vendor-onboarding   (2 replicas, HPA)
-├── keycloak                      (1 replica, PostgreSQL backend)
-├── qdrant                        (StatefulSet, persistent volume)
-└── nginx-ingress                 (TLS termination, path routing)
+    subgraph IDENTITY ["🔐 Identity — Keycloak 24"]
+        KC["OIDC · OAuth2 · JWT issuer\nRBAC · realm: flowpilot"]
+    end
 
-Data layer
-├── Azure Database for PostgreSQL  (Keycloak, workflow state — replaces SQLite)
-├── Qdrant                         (vector store, PVC)
-└── Azure Blob Storage             (policy document store)
+    subgraph AI_BACKENDS ["🤖 AI Backends"]
+        OAI["OpenAI Platform\nGPT-4o · text-embedding-3-large"]
+    end
 
-Observability
-├── Azure Monitor + Log Analytics  (structured JSON log ingestion)
-├── Application Insights           (distributed tracing, trace_id correlation)
-└── Azure Managed Grafana          (retrieval metrics, HITL queue depth)
+    subgraph HUB ["🔷 AI Gateway HUB — Azure API Management"]
+        APIM["JWT validation · RBAC · Rate limiting\nAPI versioning · Token cost governance\n/api/rag  ·  /api/workflow  ·  /auth"]
+        OBS["📊 Observability\nApp Insights · trace_id · Log Analytics"]
+    end
 
-Secrets management
-└── Azure Key Vault                (OPENAI_API_KEY, DB credentials, Keycloak secrets)
+    subgraph RAG_SPOKE ["🔵 RAG Spoke — flowpilot-rag-service · AKS · 2 replicas"]
+        RAG["FastAPI · LangChain\nHybrid RRF · Confidence gate · Guardrails"]
+        QD[("Qdrant\nStatefulSet · PVC\ndense + sparse vectors")]
+        RAG --> QD
+    end
 
-CI/CD
-└── GitHub Actions
-    ├── build + test (pytest, coverage gate)
-    ├── docker build + push (GHCR)
-    └── kubectl apply (AKS rolling deploy)
+    subgraph AGENT_SPOKE ["🟣 Agentic Spoke — flowpilot-vendor-onboarding · AKS · 2 replicas"]
+        ONB["FastAPI · LangGraph\n5-node state machine · HITL gate\nRetry · dead-letter · idempotency"]
+        WF[("SQLite → PostgreSQL\nWorkflow state · Audit events")]
+        ONB --> WF
+    end
+
+    subgraph DATA ["💾 Data Layer"]
+        PG[("Azure PostgreSQL\nKeycloak · workflow state")]
+        BLOB[("Azure Blob Storage\nPolicy documents")]
+        KV["🔑 Azure Key Vault\nSecrets via CSI driver"]
+    end
+
+    subgraph CICD ["🚀 CI/CD — GitHub Actions"]
+        GHA["build · test · docker push GHCR"]
+        K8S["kubectl apply · AKS rolling deploy"]
+        GHA --> K8S
+    end
+
+    subgraph SECURITY ["🛡️ Security & Governance"]
+        SEN["Azure Sentinel"]
+        POL["Azure Policy"]
+        DEF["Defender for Cloud"]
+    end
+
+    Browser -- "OIDC Auth Code" --> IDENTITY
+    Browser -- "Bearer JWT" --> HUB
+    IDENTITY --> HUB
+    AI_BACKENDS --> RAG_SPOKE
+    AI_BACKENDS --> AGENT_SPOKE
+
+    HUB -- "/api/rag/*" --> RAG_SPOKE
+    HUB -- "/api/workflow/*" --> AGENT_SPOKE
+
+    AGENT_SPOKE -- "POST /query + trace_id" --> RAG_SPOKE
+
+    RAG_SPOKE --> DATA
+    AGENT_SPOKE --> DATA
+    IDENTITY --> PG
+
+    RAG_SPOKE --> OBS
+    AGENT_SPOKE --> OBS
+
+    CICD --> AGENT_SPOKE
+    CICD --> RAG_SPOKE
+
+    SECURITY -.-> HUB
+    SECURITY -.-> RAG_SPOKE
+    SECURITY -.-> AGENT_SPOKE
 ```
 
 | Decision | Rationale |
@@ -260,6 +299,82 @@ CI/CD
 | Qdrant as StatefulSet | Requires persistent volumes and stable network identity |
 | PostgreSQL for production | SQLite replaced at production scope; schema migration is config-only (ADR-005) |
 | Key Vault for secrets | Injected via CSI driver — never in environment variables in production |
+
+---
+
+## FlowPilot in the Azure AI Hub/Spoke Ecosystem
+
+FlowPilot is designed to operate as a **spoke** in the Microsoft Azure AI Foundry Hub/Spoke reference architecture. Each FlowPilot component maps directly onto a recognised pattern in that ecosystem.
+
+```mermaid
+graph TD
+
+    subgraph BACKENDS ["☁️ Central AI Backends"]
+        OAI["Azure OpenAI\nGPT-4o · text-embedding-3-large"]
+        AIS["Azure AI Search\nalternative retrieval backend"]
+    end
+
+    subgraph HUB ["🔷 AI Gateway HUB — AI Governance Layer"]
+        APIM["API Management\nJWT validation · RBAC · rate limiting\ncost governance · usage ingestion"]
+        EVAL["Central AI Evaluation\nApp Insights · Log Analytics\ntrace_id · AI quality metrics"]
+    end
+
+    subgraph IAM ["🔐 Identity"]
+        ENTRA["Entra ID\nproduction scope\n→ Keycloak 24 at portfolio scope"]
+    end
+
+    subgraph RAG_SPOKE ["🔵 FlowPilot RAG Spoke — flowpilot-rag-service"]
+        direction LR
+        KNOWLEDGE["Knowledge layer\nQdrant dense + sparse vectors\nLangChain retrieval chains"]
+        GROUND["Grounding pipeline\nconfidence gate · guardrails\ncite or block"]
+        KNOWLEDGE --> GROUND
+    end
+
+    subgraph AGENT_SPOKE ["🟣 FlowPilot Agent Spoke — flowpilot-vendor-onboarding"]
+        direction LR
+        ORCH["Agent Orchestrator\nLangGraph 5-node state machine\ncollect → retrieve → assess → approve → complete"]
+        HITL_NODE["HITL Gate\nagent pauses\nhuman decision required"]
+        ORCH --> HITL_NODE
+    end
+
+    subgraph HITL_SPOKE ["👤 Human-in-the-Loop Spoke"]
+        APPROVER["Security Approver\nApproval queue UI\nPOST /workflows/id/approve"]
+        AUDIT["Audit trail\n11 event types · trace_id\nfull decision chain"]
+    end
+
+    subgraph FRONTEND ["🖥️ Frontend"]
+        UI["FlowPilot UI\nReact 18 · Vite · Tailwind\n9 scenes · role-aware"]
+    end
+
+    UI --> APIM
+    APIM --> AGENT_SPOKE
+    APIM --> RAG_SPOKE
+    APIM --> ENTRA
+
+    ORCH -- "POST /query + trace_id" --> GROUND
+    ORCH --> OAI
+    KNOWLEDGE --> OAI
+
+    HITL_NODE --> APPROVER
+    APPROVER --> AUDIT
+
+    RAG_SPOKE --> EVAL
+    AGENT_SPOKE --> EVAL
+    ENTRA -- "JWT · RBAC" --> APIM
+```
+
+### Mapping to Azure AI Reference Architecture
+
+| Azure AI Hub/Spoke pattern | FlowPilot component | Notes |
+|---|---|---|
+| Central AI Backends → Azure OpenAI | OpenAI GPT-4o + text-embedding-3-large | Shared by both RAG and Agentic spokes |
+| AI Gateway HUB → APIM | Azure API Management | JWT validation, rate limiting, cost governance |
+| AI Governance Layer → RBAC | Keycloak 24 → Entra ID in production | Keycloak is portfolio scope; OIDC contract is identical |
+| AI-Foundry-Agents SPOKE | flowpilot-rag-service | Knowledge retrieval, confidence gating, guardrails |
+| Multi-Agent System SPOKE | flowpilot-vendor-onboarding | LangGraph orchestrator; RAG service is the knowledge tool |
+| Logic-App-Agent SPOKE → HITL | HITL approval gate | Agent pauses at `request_approval`; human approver resumes via UI |
+| Central AI Evaluation | App Insights + Log Analytics | trace_id correlation; 11 audit event types; retrieval quality metrics |
+| Entra ID | Keycloak 24 | Production upgrade: replace JWKS URL and issuer — no code changes |
 
 ---
 
