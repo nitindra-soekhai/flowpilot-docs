@@ -1,24 +1,120 @@
-# FlowPilot — AI Platform Portfolio
+# FlowPilot — Enterprise AI Orchestration Platform
 
 **Built by Nitindra Soekhai · NSCS B.V.**
 
-> An enterprise-grade AI platform demonstrating senior AI architect capabilities across RAG architecture, agentic orchestration, human-in-the-loop governance, operational resilience, and full observability — built around a realistic vendor onboarding use case.
+> An enterprise AI orchestration platform demonstrating senior AI architect capabilities — designed as a reusable platform, demonstrated through a vendor onboarding use case. RAG architecture, agentic orchestration, human-in-the-loop governance, operational resilience, and full observability.
+
+**The vendor onboarding workflow is the demonstration domain. FlowPilot is the platform.**
 
 ---
 
-## What FlowPilot Does
+## Why This Architecture?
 
-FlowPilot is an AI-assisted **vendor onboarding coordination platform** for large enterprises. It solves a real operational problem: vendor onboarding in enterprise environments requires coordination across procurement, security, legal, compliance, and IT — resulting in delays, inconsistent policy interpretation, unclear approval ownership, and lack of transparency.
+This section explains the decisions that distinguish architectural thinking from engineering execution.
 
-FlowPilot addresses this by combining two distinct AI paradigms in a governed, auditable platform:
+### Why deterministic retrieval first?
+
+Policy guidance is a retrieval problem, not a reasoning problem. Employees need accurate, cited answers from authoritative policy documents — not LLM-generated approximations. Deterministic hybrid retrieval (dense + sparse vectors, RRF fusion) with a confidence gate ensures answers are grounded, traceable, and consistent. Where determinism is possible, it is preferred over autonomy.
+
+### Why agentic AI only where orchestration is genuinely required?
+
+Vendor onboarding requires sequential, stateful decision-making across multiple steps — each dependent on the output of the previous. A static retrieval pipeline cannot handle conditional branching, tool sequencing, human interruption, or compensating actions. LangGraph is introduced only at this boundary. Agentic execution is not the default — it is the deliberate choice for problems that require it.
+
+### Why HITL exists as an architectural concern, not a feature?
+
+The agent produces recommendations grounded in retrieved policy. It cannot assess business context, relationship factors, or exception criteria that a human approver holds. HITL is not a safety net added after the fact — it is the explicit boundary between AI autonomy and human authority, enforced at the platform level. The agent is designed to pause. That is not a limitation. That is the governance model.
+
+### Why Qdrant over pgvector?
+
+Vendor onboarding policies contain regulatory identifiers (ISO 27001 control numbers, GDPR Article references, SOC 2 criteria) that semantic search deprioritises. Dense-only search ranked semantically fluent chunks above chunks containing exact clause references. Qdrant supports both dense and sparse vectors natively in a single collection — enabling hybrid retrieval without a join across two systems. See ADR-001.
+
+### Why LangGraph over a custom orchestration engine?
+
+LangGraph provides state machine semantics, checkpoint persistence, and conditional edge routing without requiring a custom workflow engine. The 5-node state machine maps directly to the vendor assessment lifecycle. State is persisted after each node — enabling workflow recovery on restart without re-execution. LangGraph is restricted to the domain layer (ADR-003) to prevent framework lock-in at the platform level.
+
+### Why SQLite for workflow state?
+
+At portfolio scope, SQLite provides zero-config persistent state with ANSI SQL portability. The schema is designed for migration: replacing SQLite with PostgreSQL requires a config change, not an application rewrite. The accepted tradeoff is documented explicitly in ADR-005. Production migration path: change the connection string, run the schema migration, no application code changes.
+
+### Why RBAC enforced at the platform level?
+
+Role-based access control applied per-domain produces duplicated, inconsistent enforcement. FlowPilot enforces RBAC at the platform layer — every agent tool call is validated against the requesting user's permission set before execution. An agent cannot exceed the permissions of the user who triggered it, regardless of what the agent decides to do.
+
+---
+
+## Enterprise Concerns
+
+FlowPilot is designed against the concerns that enterprise architecture review boards, security teams, and AI governance committees evaluate.
+
+| Concern | How FlowPilot addresses it |
+|---|---|
+| **Multi-tenant isolation** | Planned — workflow state and audit events are user-scoped; tenant isolation is the documented production upgrade path |
+| **RBAC enforcement** | Platform-level via Keycloak JWT validation; role extraction filters system roles; agent tool calls validated against user permissions |
+| **Auditability & traceability** | `trace_id` generated at API boundary, propagated across all service calls; 11 structured audit event types; full decision chain reconstructable |
+| **Prompt governance** | Grounding pipeline enforces citation; guardrails layer blocks uncited responses; prompt template versioning documented |
+| **Hallucination reduction** | Confidence gate (avg_score ≥ 0.65) blocks LLM call on low-quality retrieval; agent suspends and requests human clarification |
+| **Deterministic retrieval** | Hybrid RRF fusion; confidence threshold; top-k chunk scoring visible in audit trail |
+| **Human-in-the-loop escalation** | HITL gate at `request_approval` node; agent pauses; approval timeout triggers compensating action and escalation |
+| **Retry & degraded mode** | Exponential backoff (500ms, ×2, max 3 attempts); RAG unavailable → structured questionnaire fallback; `degraded=true` in all log lines |
+| **Idempotent workflows** | Unique constraint on `request_id` prevents duplicate workflow creation under network retry conditions |
+| **Policy-grounded AI decisions** | Retrieved policy chunks injected into prompt with citation instruction; response blocked if no source cited |
+
+---
+
+## Why Agents Are Not Always the Answer
+
+FlowPilot intentionally separates deterministic and agentic execution. This separation is the core architectural decision.
+
+**Deterministic retrieval is used when:**
+- The answer exists in a policy document
+- Consistency and reproducibility are required
+- Governance demands a traceable, cited source
+- The operation is stateless and query-response in nature
+
+**Agentic execution is used only when:**
+- Multiple dependent decisions exist across sequential steps
+- Stateful orchestration is required between operations
+- Tool sequencing is dynamic and context-dependent
+- Human approval may interrupt execution mid-workflow
+- Compensating actions must be triggered on failure
+
+**The result:** RAG handles policy guidance. LangGraph handles workflow orchestration. Neither crosses the other's boundary (ADR-007). A future domain — contract management, IT provisioning, compliance assessment — can consume the RAG service without touching the agentic layer.
+
+Agentic AI applied where determinism suffices produces unpredictable, ungovernable, and unauditable systems. FlowPilot is deliberately structured to prevent this.
+
+---
+
+## What FlowPilot Demonstrates
 
 | Capability | What it delivers |
 |---|---|
-| **Policy Guidance** | Employees ask onboarding questions in natural language and receive grounded, cited policy answers retrieved from the enterprise knowledge base |
-| **Workflow Orchestration** | An AI agent autonomously moves a vendor onboarding request through a 5-stage workflow: collect → retrieve → assess → approve → complete |
-| **Approval Coordination** | Multi-department approval routing (procurement, security, legal, compliance) with escalation, timeout handling, and human authority preserved |
-| **Audit & Traceability** | Every AI decision, retrieval call, and approval action is logged with a shared `trace_id` — fully reconstructable from request to resolution |
-| **Governed AI Interaction** | AI may recommend, never approve. RBAC bounds what the agent can access. Uncited guidance is blocked by the guardrails layer |
+| **Policy Guidance** | Grounded, cited answers from the enterprise knowledge base via hybrid RAG retrieval |
+| **Workflow Orchestration** | Autonomous 5-stage LangGraph agent: collect → retrieve → assess → approve → complete |
+| **Approval Coordination** | Multi-department approval routing with escalation, timeout handling, and preserved human authority |
+| **Audit & Traceability** | `trace_id` correlation across services; 11 structured event types; full decision chain reconstructable |
+| **Governed AI Interaction** | AI may recommend, never approve. RBAC bounds agent scope. Uncited guidance is blocked. |
+
+---
+
+## Production Readiness
+
+| Capability | Status |
+|---|---|
+| RAG retrieval (hybrid RRF, confidence gate) | ✅ Implemented |
+| Agentic state machine (LangGraph, 5 nodes) | ✅ Implemented |
+| HITL approval gate | ✅ Implemented |
+| RBAC enforcement (Keycloak OIDC, JWT) | ✅ Implemented |
+| Audit trail (11 event types, trace_id) | ✅ Implemented |
+| Operational resilience (retry, dead-letter, degraded mode) | ✅ Implemented |
+| Idempotency guarantees | ✅ Implemented |
+| Workflow checkpoint recovery | ✅ Implemented |
+| Structured JSON logging (structlog) | ✅ Implemented |
+| Policy document management UI | 🔄 In progress |
+| Evaluation pipeline (retrieval quality, LLM output) | 📋 Planned |
+| Multi-tenancy isolation | 📋 Planned |
+| Operational SLIs/SLOs | 📋 Planned |
+| Cost governance (token budget, per-workflow tracking) | 📋 Planned |
+| Production infrastructure (AKS, APIM, ingress) | 📋 Planned |
 
 ---
 
@@ -28,26 +124,26 @@ The screenshots below show the complete end-to-end flow across both user roles. 
 
 ### Step 1 — Keycloak OIDC Login (sarah.chen · procurement_manager)
 ![Keycloak Login sarah.chen](docs/images/screenshots/01-keycloak-login-sarah.png)
-> Keycloak 24 OIDC Authorization Code flow. Browser redirected to `localhost:8080/realms/flowpilot`. JWT issued on sign-in, attached as Bearer token to all subsequent API calls. See ADR-012.
+> Keycloak 24 OIDC Authorization Code flow. JWT issued on sign-in, attached as Bearer token to all subsequent API calls. See ADR-012.
 
 ### Step 2 — New Vendor Request Form
 ![Vendor Form](docs/images/screenshots/02-vendor-form.png)
-> `sarah.chen` (procurement_manager) submits a vendor onboarding request. On submit: `POST /workflows/` with Bearer token → LangGraph state machine starts → `workflow_id` and `trace_id` generated.
+> `POST /workflows/` with Bearer token → LangGraph state machine starts → `workflow_id` and `trace_id` generated.
 
 ### Step 3 — Security Findings (AI-generated, policy-grounded)
 ![Security Findings](docs/images/screenshots/03-security-findings.png)
-> LangGraph `assess_risk` node calls OpenAI GPT-4o with retrieved policy chunks as context. Findings are grounded in real policy references (SEC-101, SEC-103, RISK-301). Confidence scores (78–95%) reflect RAG retrieval quality.
+> LangGraph `assess_risk` node calls OpenAI GPT-4o with retrieved policy chunks. Findings grounded in real policy references (SEC-101, SEC-103, RISK-301). Confidence scores reflect RAG retrieval quality.
 
 ![Security Findings — Action Required](docs/images/screenshots/04-security-findings-action.png)
-> Findings routed to security approval queue. Human review required before onboarding proceeds — this is the HITL gate (ADR-004).
+> Findings routed to security approval queue. Human review required — this is the HITL gate (ADR-004).
 
 ### Step 4 — Account Switch to michael.davidson (security_approver)
 ![Keycloak Login michael.davidson](docs/images/screenshots/05-keycloak-login-michael.png)
-> `keycloak.logout()` called with `redirectUri` preserving `workflow_id`. michael.davidson signs in — new JWT with `security_approver` role. Approval queue pre-loads the correct workflow.
+> New JWT with `security_approver` role. Approval queue pre-loads the correct workflow.
 
 ### Step 5 — Approval Queue (HITL Gate)
 ![Approval Queue](docs/images/screenshots/06-approval-queue.png)
-> michael.davidson sees the pending workflow submitted by sarah.chen. Decision submitted via `POST /workflows/{id}/approve` with Bearer token. RBAC enforced: only `security_approver` role reaches this endpoint.
+> Decision submitted via `POST /workflows/{id}/approve` with Bearer token. RBAC enforced: only `security_approver` reaches this endpoint.
 
 ### Step 6 — Workflow Complete
 ![Workflow Complete](docs/images/screenshots/07-workflow-complete.png)
@@ -55,18 +151,16 @@ The screenshots below show the complete end-to-end flow across both user roles. 
 
 ### Step 7 — Audit Trail (11 real events, trace_id correlated)
 ![Audit Trail](docs/images/screenshots/08-audit-trail.png)
-> `GET /workflows/{id}/events` called with Bearer token. Every event carries `trace_id`, `service` tag (`rag` / `workflow` / `security`), actor, and CET timestamp. Full reconstruction of the AI decision chain.
+> Every event carries `trace_id`, `service` tag (`rag` / `workflow` / `security`), actor, and CET timestamp.
 
 ![Audit Trail Event Log](docs/images/screenshots/09-audit-trail-events.png)
-> `workflow.created` → `rag.query.initiated` → `rag.query.completed` → `security.analysis.started` — all correlated by the same `trace_id`. Filter by service to isolate any layer.
+> `workflow.created` → `rag.query.initiated` → `rag.query.completed` → `security.analysis.started` — all correlated by the same `trace_id`.
 
 ---
 
 ## Architecture
 
 ### Two AI Paradigms — Explicitly Separated
-
-FlowPilot demonstrates two enterprise AI patterns that serve different purposes and live in different repositories:
 
 ```mermaid
 flowchart TD
@@ -107,7 +201,6 @@ flowchart TD
     OAI(["🤖 OpenAI Platform\nGPT-4o · text-embedding-3-large"])
 
     UI -- "POST /workflows/ + Bearer" --> AGENT
-    UI -- "POST /query + Bearer" --> GUARD
     N2 -- "POST /query" --> GUARD
     GUARD -- "grounded response + avg_score + trace_id" --> N2
     N3 --> OAI
@@ -116,21 +209,61 @@ flowchart TD
 
 ### Architecture Diagrams
 
-**FlowPilot Assistance & Retrieval Architecture** — Phase 1 (retrieval) and Phase 2 (grounding + explanation):
-
 ![FlowPilot Assistance & Retrieval Architecture](docs/images/fig1-architecture.png)
-
-**Stack to Repository Mapping** — how components distribute across repositories, where LangGraph is introduced, and how the vendor onboarding service calls the RAG service:
 
 ![FlowPilot Stack to Repository Mapping](docs/images/fig2-repo-mapping.png)
 
 ---
 
+## Deployment Architecture
+
+> **Current scope:** Local Docker Compose. The production architecture below documents the target deployment — demonstrating infrastructure thinking beyond the portfolio implementation.
+
+```
+Internet → Azure API Management (APIM)
+                │
+                ├── /api/rag/*      → flowpilot-rag-service        (AKS pod)
+                ├── /api/workflow/* → flowpilot-vendor-onboarding   (AKS pod)
+                └── /auth/*         → Keycloak 24                   (AKS pod)
+
+AKS Cluster (flowpilot namespace)
+├── flowpilot-rag-service         (2 replicas, HPA on CPU/memory)
+├── flowpilot-vendor-onboarding   (2 replicas, HPA)
+├── keycloak                      (1 replica, PostgreSQL backend)
+├── qdrant                        (StatefulSet, persistent volume)
+└── nginx-ingress                 (TLS termination, path routing)
+
+Data layer
+├── Azure Database for PostgreSQL  (Keycloak, workflow state — replaces SQLite)
+├── Qdrant                         (vector store, PVC)
+└── Azure Blob Storage             (policy document store)
+
+Observability
+├── Azure Monitor + Log Analytics  (structured JSON log ingestion)
+├── Application Insights           (distributed tracing, trace_id correlation)
+└── Azure Managed Grafana          (retrieval metrics, HITL queue depth)
+
+Secrets management
+└── Azure Key Vault                (OPENAI_API_KEY, DB credentials, Keycloak secrets)
+
+CI/CD
+└── GitHub Actions
+    ├── build + test (pytest, coverage gate)
+    ├── docker build + push (GHCR)
+    └── kubectl apply (AKS rolling deploy)
+```
+
+| Decision | Rationale |
+|---|---|
+| APIM as gateway | Centralised rate limiting, JWT validation, API versioning, and token cost governance |
+| AKS over ACI | Horizontal scaling, health probes, rolling deployments, namespace-level isolation |
+| Qdrant as StatefulSet | Requires persistent volumes and stable network identity |
+| PostgreSQL for production | SQLite replaced at production scope; schema migration is config-only (ADR-005) |
+| Key Vault for secrets | Injected via CSI driver — never in environment variables in production |
+
+---
+
 ## Traceability — Every AI Decision Is Reconstructable
-
-Every request through FlowPilot carries a `trace_id` generated at the API boundary. This trace ID propagates across all service calls, log entries, and audit events — enabling full reconstruction of any AI-assisted decision.
-
-### Trace Flow
 
 ```mermaid
 sequenceDiagram
@@ -144,63 +277,29 @@ sequenceDiagram
 
     Sarah->>KC: Login (OIDC Auth Code Flow)
     KC-->>UI: JWT Bearer · role: procurement_manager
-
     Sarah->>UI: Submit vendor onboarding request
     UI->>AGENT: POST /workflows/ + Bearer JWT
     Note over AGENT: ✦ trace_id generated<br/>📋 workflow.created emitted
-
     AGENT->>RAG: POST /query + X-Trace-ID header
     Note over RAG: 📋 rag.query.initiated emitted
     RAG->>OAI: Embed query (text-embedding-3-large)
     OAI-->>RAG: Dense vector
-    Note over RAG: Hybrid RRF fusion · confidence gate
     RAG-->>AGENT: Grounded response + avg_score + trace_id
-    Note over RAG: 📋 rag.query.completed emitted<br/>avg_score · confidence_met · latency_ms
-
+    Note over RAG: 📋 rag.query.completed emitted
     AGENT->>OAI: GPT-4o · security risk assessment
-    Note over AGENT: 📋 security.analysis.started emitted
-    OAI-->>AGENT: Risk level + findings
     Note over AGENT: 📋 security.findings.generated emitted<br/>📋 workflow.routed emitted
-
-    Note over AGENT: ⏸ HITL GATE — agent pauses<br/>awaiting human decision
-
+    Note over AGENT: ⏸ HITL GATE — agent pauses
     Michael->>KC: Login (account switch)
     KC-->>UI: JWT Bearer · role: security_approver
-    Michael->>UI: View approval queue
     UI->>AGENT: POST /workflows/{id}/approve + Bearer
     Note over AGENT: 📋 approval.decision.submitted emitted<br/>📋 workflow.completed emitted
-
-    Sarah->>UI: View audit trail
     UI->>AGENT: GET /workflows/{id}/events + Bearer
     AGENT-->>UI: 11 events · all correlated by trace_id
-```
-
-### Structured Log Example
-
-Every log line is a machine-readable JSON object:
-
-```json
-{
-  "event": "rag.query.completed",
-  "trace_id": "a3f8-4c21-9b7d",
-  "workflow_id": "5aa79244-f8c9-4c8f",
-  "service": "flowpilot-rag-service",
-  "query": "cloud vendor data access controls ISO 27001",
-  "strategy": "hybrid",
-  "results_count": 5,
-  "avg_score": 0.812,
-  "confidence_met": true,
-  "latency_ms": 342,
-  "timestamp": "2026-05-18T08:30:45Z",
-  "level": "info"
-}
 ```
 
 ---
 
 ## Retrieval Scoring & Confidence
-
-The RAG service returns verifiable quality metrics with every retrieval operation. These metrics are visible in the UI audit trail and in the structured log.
 
 | Metric | What it means | Target |
 |---|---|---|
@@ -209,14 +308,6 @@ The RAG service returns verifiable quality metrics with every retrieval operatio
 | `results_count` | Number of chunks returned (top-k) | 5 |
 | `latency_ms` | Total retrieval + LLM grounding time | < 3000ms |
 | `strategy` | Retrieval mode used | `hybrid` |
-
-**Why this matters:** Without scoring, you cannot tell whether the AI's answer was grounded in relevant content or not. The confidence threshold gate (default 0.65) blocks the agentic workflow from continuing if retrieval quality is insufficient — the agent suspends and requests human clarification rather than proceeding on uncertain grounding.
-
-### Hybrid Retrieval — Why Not Dense-Only
-
-Early testing showed that dense-only search ranked semantically fluent chunks above chunks containing exact regulatory identifiers. A policy chunk mentioning "data protection obligations" outranked a chunk containing the exact clause "GDPR Article 28(3)" when queried with the clause reference.
-
-**Decision:** Hybrid retrieval — OpenAI dense embeddings fused with Qdrant sparse vectors via Reciprocal Rank Fusion (weights: 0.7 dense / 0.3 sparse). Documented in ADR-002.
 
 ---
 
@@ -232,22 +323,7 @@ Early testing showed that dense-only search ranked semantically fluent chunks ab
 
 ---
 
-## Authentication
-
-Keycloak 24 OIDC with role-based access control:
-
-| User | Role | Access |
-|---|---|---|
-| `sarah.chen` | `procurement_manager` | Submit vendor onboarding requests |
-| `michael.davidson` | `security_approver` | Review and approve/reject in approval queue |
-
-Both backend services validate JWTs via Keycloak JWKS endpoint. Role extraction filters Keycloak system roles (`offline_access`, `uma_authorization`) before applying business role permissions. Documented in ADR-012.
-
----
-
 ## Architecture Decision Records
-
-12 ADRs — each with context, decision, alternatives considered, and explicitly accepted tradeoff.
 
 | ADR | Layer | Decision |
 |---|---|---|
@@ -284,9 +360,9 @@ Both backend services validate JWTs via Keycloak JWKS endpoint. Role extraction 
 | Release | What it demonstrates |
 |---|---|
 | **v1.1-authentication-ui** | Keycloak OIDC, React UI 9 scenes, real audit trail (11 events), ADR-012 |
-| **v1.0-final** | 11 ADRs, C4 diagrams, governance model, sequence diagrams |
-| **v0.3-iteration-2** | Resilience: retry, dead-letter, degraded mode, idempotency, confidence threshold |
-| **v0.2-iteration-1** | Agentic AI: LangGraph 5-node state machine, HITL approval gate |
+| **v1.0-final** | Complete platform, all ADRs, C4 diagrams, governance model |
+| **v0.3-iteration-2** | Operational resilience, AI governance, observability complete |
+| **v0.2-iteration-1** | Hybrid retrieval, agentic workflow, HITL approval |
 | **v0.1-mvp** | RAG service: hybrid retrieval, observability foundation, unit tests |
 
 ---
@@ -322,27 +398,15 @@ Both backend services validate JWTs via Keycloak JWKS endpoint. Role extraction 
 ## How to Run
 
 ```powershell
-# Terminal 1 — RAG service + Keycloak + Qdrant
-cd flowpilot-rag-service
-docker compose up
-
-# Terminal 2 — Vendor onboarding agent
-cd flowpilot-vendor-onboarding
-docker compose up
-
-# Terminal 3 — React UI
-cd flowpilot-ui
-npm run dev
-# → http://localhost:3000
+cd flowpilot-rag-service && docker compose up        # Terminal 1
+cd flowpilot-vendor-onboarding && docker compose up  # Terminal 2
+cd flowpilot-ui && npm run dev                       # Terminal 3 → http://localhost:3000
 ```
 
-**Login credentials:**
-- `sarah.chen` — procurement_manager
-- `michael.davidson` — security_approver
-
+**Login credentials:** `sarah.chen` (procurement_manager) · `michael.davidson` (security_approver)
 > Credentials available on request for evaluation purposes.
 
-**No OpenAI key required** — `FP_MOCK_MODE=true` runs the full workflow with realistic mock responses. Full architecture, workflow, observability, and resilience are demonstrable without any API cost.
+`FP_MOCK_MODE=true` — no OpenAI key required. Full workflow, observability, and resilience demonstrable without API cost.
 
 ---
 
