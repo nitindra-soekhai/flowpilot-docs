@@ -337,8 +337,10 @@ npm run dev
 ```
 
 **Login credentials:**
-- `sarah.chen` / `FlowPilot2026!` — procurement_manager
-- `michael.davidson` / `FlowPilot2026!` — security_approver
+- `sarah.chen` — procurement_manager
+- `michael.davidson` — security_approver
+
+> Credentials available on request for evaluation purposes.
 
 **No OpenAI key required** — `FP_MOCK_MODE=true` runs the full workflow with realistic mock responses. Full architecture, workflow, observability, and resilience are demonstrable without any API cost.
 
