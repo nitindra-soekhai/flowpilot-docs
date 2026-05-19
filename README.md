@@ -6,8 +6,12 @@
 
 **The vendor onboarding workflow is the demonstration domain. FlowPilot is the platform.**
 
-![CI](https://github.com/nitindra-soekhai/flowpilot-rag-service/actions/workflows/ci.yml/badge.svg?branch=dev)
-![Tests](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding/actions/workflows/ci.yml/badge.svg?branch=dev)
+| | Repository | Build |
+|---|---|---|
+| RAG Service | `flowpilot-rag-service` | [![CI](https://github.com/nitindra-soekhai/flowpilot-rag-service/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/nitindra-soekhai/flowpilot-rag-service/actions) |
+| Agentic AI | `flowpilot-vendor-onboarding` | [![CI](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding/actions) |
+| Frontend | `flowpilot-ui` | [![CI](https://github.com/nitindra-soekhai/flowpilot-ui/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/nitindra-soekhai/flowpilot-ui/actions) |
+| Docs | `flowpilot-docs` | [![Docs](https://img.shields.io/badge/docs-live-blue)](https://github.com/nitindra-soekhai/flowpilot-docs) |
 
 ---
 
