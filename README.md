@@ -1,6 +1,6 @@
-﻿# FlowPilot — Enterprise AI Orchestration Platform
+# FlowPilot — Enterprise AI Orchestration Platform
 
-**Built by Nitindra Soekhai — NSCS B.V.**
+**Built by Nitindra Soekhai · NSCS B.V.**
 
 > An enterprise AI orchestration platform demonstrating senior AI architect capabilities — designed as a reusable platform, demonstrated through a vendor onboarding use case. RAG architecture, agentic orchestration, human-in-the-loop governance, operational resilience, and full observability.
 
@@ -52,7 +52,7 @@ The screenshots below show the complete end-to-end flow across both user roles. 
 
 ### Step 6 — Workflow Complete
 ![Workflow Complete](docs/images/screenshots/07-workflow-complete.png)
-> Traditional process: 45ΓÇô60 days. FlowPilot: ~15 minutes. The agent executed autonomously; a human made the final call.
+> Traditional process: 45–60 days. FlowPilot: ~15 minutes. The agent executed autonomously; a human made the final call.
 
 ### Step 7 — Audit Trail (11 real events, trace_id correlated)
 ![Audit Trail](docs/images/screenshots/08-audit-trail.png)
@@ -107,10 +107,10 @@ FlowPilot is designed against the concerns that enterprise architecture review b
 | **RBAC enforcement** | Platform-level via Keycloak JWT validation; role extraction filters system roles; agent tool calls validated against user permissions |
 | **Auditability & traceability** | `trace_id` generated at API boundary, propagated across all service calls; 11 structured audit event types; full decision chain reconstructable |
 | **Prompt governance** | Grounding pipeline enforces citation; guardrails layer blocks uncited responses; prompt template versioning documented |
-| **Hallucination reduction** | Confidence gate (avg_score ΓëÑ 0.65) blocks LLM call on low-quality retrieval; agent suspends and requests human clarification |
+| **Hallucination reduction** | Confidence gate (avg_score ≥ 0.65) blocks LLM call on low-quality retrieval; agent suspends and requests human clarification |
 | **Deterministic retrieval** | Hybrid RRF fusion; confidence threshold; top-k chunk scoring visible in audit trail |
 | **Human-in-the-loop escalation** | HITL gate at `request_approval` node; agent pauses; approval timeout triggers compensating action and escalation |
-| **Retry & degraded mode** | Exponential backoff (500ms, ├ù2, max 3 attempts); RAG unavailable → structured questionnaire fallback; `degraded=true` in all log lines |
+| **Retry & degraded mode** | Exponential backoff (500ms, ×2, max 3 attempts); RAG unavailable → structured questionnaire fallback; `degraded=true` in all log lines |
 | **Idempotent workflows** | Unique constraint on `request_id` prevents duplicate workflow creation under network retry conditions |
 | **Policy-grounded AI decisions** | Retrieved policy chunks injected into prompt with citation instruction; response blocked if no source cited |
 
@@ -145,47 +145,47 @@ Agentic AI applied where determinism suffices produces unpredictable, ungovernab
 
 ```mermaid
 flowchart TD
-    UI(["≡ƒûÑ∩╕Å FlowPilot UI\nReact 18 · Vite · Tailwind · Port 3000"])
-    KC(["≡ƒöÉ Keycloak 24\nOIDC Identity Provider · Port 8080"])
+ UI([" FlowPilot UI\nReact 18 . Vite . Tailwind . Port 3000"])
+ KC([" Keycloak 24\nOIDC Identity Provider . Port 8080"])
 
-    UI -- "OIDC Auth Code Flow" --> KC
-    KC -- "JWT Bearer Token" --> UI
+ UI -- "OIDC Auth Code Flow" --> KC
+ KC -- "JWT Bearer Token" --> UI
 
-    subgraph RAG ["≡ƒö╡ RAG Paradigm — flowpilot-rag-service · Port 8000 · Stateless · Domain-agnostic"]
-        direction LR
-        INGEST["≡ƒôä PDF Ingest\nLangChain loader + splitter"]
-        EMBED["≡ƒº« OpenAI\ntext-embedding-3-large"]
-        QDRANT[("≡ƒùä∩╕Å Qdrant\nDense + Sparse Vectors")]
-        HYBRID["ΓÜí Hybrid RRF Fusion\n0.7 dense · 0.3 sparse"]
-        CONF{"Confidence Gate\navg_score ΓëÑ 0.65"}
-        GUARD["≡ƒ¢í∩╕Å Grounding Pipeline\n+ AI Guardrails"]
-        BLOCKED(["Γ¥î Blocked\nLow confidence"])
+ subgraph RAG [" RAG Paradigm -- flowpilot-rag-service . Port 8000 . Stateless . Domain-agnostic"]
+ direction LR
+ INGEST[" PDF Ingest\nLangChain loader + splitter"]
+ EMBED[" OpenAI\ntext-embedding-3-large"]
+ QDRANT[(" Qdrant\nDense + Sparse Vectors")]
+ HYBRID[" Hybrid RRF Fusion\n0.7 dense . 0.3 sparse"]
+ CONF{"Confidence Gate\navg_score >= 0.65"}
+ GUARD[" Grounding Pipeline\n+ AI Guardrails"]
+ BLOCKED(["BLOCKED Blocked\nLow confidence"])
 
-        INGEST --> EMBED --> QDRANT
-        QDRANT --> HYBRID --> CONF
-        CONF -- "Γ£ô pass" --> GUARD
-        CONF -- "Γ£ù fail" --> BLOCKED
-    end
+ INGEST --> EMBED --> QDRANT
+ QDRANT --> HYBRID --> CONF
+ CONF -- "pass pass" --> GUARD
+ CONF -- "fail fail" --> BLOCKED
+ end
 
-    subgraph AGENT ["≡ƒƒú Agentic AI Paradigm — flowpilot-vendor-onboarding · Port 8001 · Stateful · LangGraph"]
-        direction TB
-        N1["collect_vendor_info"]
-        N2["retrieve_policies"]
-        N3["assess_risk\nOpenAI GPT-4o"]
-        N4[/"ΓÅ╕∩╕Å request_approval\nHITL GATE — agent pauses"/]
-        N5(["Γ£à complete\n11 audit events · SQLite state"])
+ subgraph AGENT [" Agentic AI Paradigm -- flowpilot-vendor-onboarding . Port 8001 . Stateful . LangGraph"]
+ direction TB
+ N1["collect_vendor_info"]
+ N2["retrieve_policies"]
+ N3["assess_risk\nOpenAI GPT-4o"]
+ N4[/"PAUSED request_approval\nHITL GATE -- agent pauses"/]
+ N5(["DONE complete\n11 audit events . SQLite state"])
 
-        N1 --> N2 --> N3 --> N4
-        N4 -- "Human decision required" --> N5
-    end
+ N1 --> N2 --> N3 --> N4
+ N4 -- "Human decision required" --> N5
+ end
 
-    OAI(["≡ƒñû OpenAI Platform\nGPT-4o · text-embedding-3-large"])
+ OAI([" OpenAI Platform\nGPT-4o . text-embedding-3-large"])
 
-    UI -- "POST /workflows/ + Bearer" --> AGENT
-    N2 -- "POST /query" --> GUARD
-    GUARD -- "grounded response + avg_score + trace_id" --> N2
-    N3 --> OAI
-    EMBED --> OAI
+ UI -- "POST /workflows/ + Bearer" --> AGENT
+ N2 -- "POST /query" --> GUARD
+ GUARD -- "grounded response + avg_score + trace_id" --> N2
+ N3 --> OAI
+ EMBED --> OAI
 ```
 
 ### Architecture Diagrams
@@ -202,75 +202,75 @@ flowchart TD
 
 ```mermaid
 flowchart TB
-    Browser(["≡ƒîÉ Browser / React UI"])
+ Browser([" Browser / React UI"])
 
-    subgraph IDENTITY ["≡ƒöÉ Identity — Keycloak 24"]
-        KC["OIDC · OAuth2 · JWT issuer\nRBAC · realm: flowpilot"]
-    end
+ subgraph IDENTITY [" Identity -- Keycloak 24"]
+ KC["OIDC . OAuth2 . JWT issuer\nRBAC . realm: flowpilot"]
+ end
 
-    subgraph AI_BACKENDS ["≡ƒñû AI Backends"]
-        OAI["OpenAI Platform\nGPT-4o · text-embedding-3-large"]
-    end
+ subgraph AI_BACKENDS [" AI Backends"]
+ OAI["OpenAI Platform\nGPT-4o . text-embedding-3-large"]
+ end
 
-    subgraph HUB ["≡ƒö╖ AI Gateway HUB — Azure API Management"]
-        APIM["JWT validation · RBAC · Rate limiting\nAPI versioning · Token cost governance\n/api/rag  ·  /api/workflow  ·  /auth"]
-        OBS["≡ƒôè Observability\nApp Insights · trace_id · Log Analytics"]
-    end
+ subgraph HUB [" AI Gateway HUB -- Azure API Management"]
+ APIM["JWT validation . RBAC . Rate limiting\nAPI versioning . Token cost governance\n/api/rag . /api/workflow . /auth"]
+ OBS[" Observability\nApp Insights . trace_id . Log Analytics"]
+ end
 
-    subgraph RAG_SPOKE ["≡ƒö╡ RAG Spoke — flowpilot-rag-service · AKS · 2 replicas"]
-        RAG["FastAPI · LangChain\nHybrid RRF · Confidence gate · Guardrails"]
-        QD[("Qdrant\nStatefulSet · PVC\ndense + sparse vectors")]
-        RAG --> QD
-    end
+ subgraph RAG_SPOKE [" RAG Spoke -- flowpilot-rag-service . AKS . 2 replicas"]
+ RAG["FastAPI . LangChain\nHybrid RRF . Confidence gate . Guardrails"]
+ QD[("Qdrant\nStatefulSet . PVC\ndense + sparse vectors")]
+ RAG --> QD
+ end
 
-    subgraph AGENT_SPOKE ["≡ƒƒú Agentic Spoke — flowpilot-vendor-onboarding · AKS · 2 replicas"]
-        ONB["FastAPI · LangGraph\n5-node state machine · HITL gate\nRetry · dead-letter · idempotency"]
-        WF[("SQLite → PostgreSQL\nWorkflow state · Audit events")]
-        ONB --> WF
-    end
+ subgraph AGENT_SPOKE [" Agentic Spoke -- flowpilot-vendor-onboarding . AKS . 2 replicas"]
+ ONB["FastAPI . LangGraph\n5-node state machine . HITL gate\nRetry . dead-letter . idempotency"]
+ WF[("SQLite -> PostgreSQL\nWorkflow state . Audit events")]
+ ONB --> WF
+ end
 
-    subgraph DATA ["≡ƒÆ╛ Data Layer"]
-        PG[("Azure PostgreSQL\nKeycloak · workflow state")]
-        BLOB[("Azure Blob Storage\nPolicy documents")]
-        KV["≡ƒöæ Azure Key Vault\nSecrets via CSI driver"]
-    end
+ subgraph DATA [" Data Layer"]
+ PG[("Azure PostgreSQL\nKeycloak . workflow state")]
+ BLOB[("Azure Blob Storage\nPolicy documents")]
+ KV[" Azure Key Vault\nSecrets via CSI driver"]
+ end
 
-    subgraph CICD ["≡ƒÜÇ CI/CD — GitHub Actions"]
-        GHA["build · test · docker push GHCR"]
-        K8S["kubectl apply · AKS rolling deploy"]
-        GHA --> K8S
-    end
+ subgraph CICD [" CI/CD -- GitHub Actions"]
+ GHA["build . test . docker push GHCR"]
+ K8S["kubectl apply . AKS rolling deploy"]
+ GHA --> K8S
+ end
 
-    subgraph SECURITY ["≡ƒ¢í∩╕Å Security & Governance"]
-        SEN["Azure Sentinel"]
-        POL["Azure Policy"]
-        DEF["Defender for Cloud"]
-    end
+ subgraph SECURITY [" Security & Governance"]
+ SEN["Azure Sentinel"]
+ POL["Azure Policy"]
+ DEF["Defender for Cloud"]
+ end
 
-    Browser -- "OIDC Auth Code" --> IDENTITY
-    Browser -- "Bearer JWT" --> HUB
-    IDENTITY --> HUB
-    AI_BACKENDS --> RAG_SPOKE
-    AI_BACKENDS --> AGENT_SPOKE
+ Browser -- "OIDC Auth Code" --> IDENTITY
+ Browser -- "Bearer JWT" --> HUB
+ IDENTITY --> HUB
+ AI_BACKENDS --> RAG_SPOKE
+ AI_BACKENDS --> AGENT_SPOKE
 
-    HUB -- "/api/rag/*" --> RAG_SPOKE
-    HUB -- "/api/workflow/*" --> AGENT_SPOKE
+ HUB -- "/api/rag/*" --> RAG_SPOKE
+ HUB -- "/api/workflow/*" --> AGENT_SPOKE
 
-    AGENT_SPOKE -- "POST /query + trace_id" --> RAG_SPOKE
+ AGENT_SPOKE -- "POST /query + trace_id" --> RAG_SPOKE
 
-    RAG_SPOKE --> DATA
-    AGENT_SPOKE --> DATA
-    IDENTITY --> PG
+ RAG_SPOKE --> DATA
+ AGENT_SPOKE --> DATA
+ IDENTITY --> PG
 
-    RAG_SPOKE --> OBS
-    AGENT_SPOKE --> OBS
+ RAG_SPOKE --> OBS
+ AGENT_SPOKE --> OBS
 
-    CICD --> AGENT_SPOKE
-    CICD --> RAG_SPOKE
+ CICD --> AGENT_SPOKE
+ CICD --> RAG_SPOKE
 
-    SECURITY -.-> HUB
-    SECURITY -.-> RAG_SPOKE
-    SECURITY -.-> AGENT_SPOKE
+ SECURITY -.-> HUB
+ SECURITY -.-> RAG_SPOKE
+ SECURITY -.-> AGENT_SPOKE
 ```
 
 | Decision | Rationale |
@@ -290,62 +290,61 @@ FlowPilot is designed to operate as a **spoke** in the Microsoft Azure AI Foundr
 ```mermaid
 graph TD
 
-    subgraph BACKENDS ["Γÿü∩╕Å Central AI Backends"]
-        OAI["Azure OpenAI\nGPT-4o · text-embedding-3-large"]
-        AIS["Azure AI Search\nalternative retrieval backend"]
-    end
+ subgraph BACKENDS [" Central AI Backends"]
+ OAI["Azure OpenAI\nGPT-4o . text-embedding-3-large"]
+ AIS["Azure AI Search\nalternative retrieval backend"]
+ end
 
-    subgraph HUB ["≡ƒö╖ AI Gateway HUB — AI Governance Layer"]
-        APIM["API Management\nJWT validation · RBAC · rate limiting\ncost governance · usage ingestion"]
-        EVAL["Central AI Evaluation\nApp Insights · Log Analytics\ntrace_id · AI quality metrics"]
-    end
+ subgraph HUB [" AI Gateway HUB -- AI Governance Layer"]
+ APIM["API Management\nJWT validation . RBAC . rate limiting\ncost governance . usage ingestion"]
+ EVAL["Central AI Evaluation\nApp Insights . Log Analytics\ntrace_id . AI quality metrics"]
+ end
 
-    subgraph IAM ["≡ƒöÉ Identity"]
-        ENTRA["Entra ID\nproduction scope\n→ Keycloak 24 at portfolio scope"]
-    end
+ subgraph IAM [" Identity"]
+ ENTRA["Entra ID\nproduction scope\n-> Keycloak 24 at portfolio scope"]
+ end
 
-    subgraph RAG_SPOKE ["≡ƒö╡ FlowPilot RAG Spoke — flowpilot-rag-service"]
-        direction LR
-        KNOWLEDGE["Knowledge layer\nQdrant dense + sparse vectors\nLangChain retrieval chains"]
-        GROUND["Grounding pipeline\nconfidence gate · guardrails\ncite or block"]
-        KNOWLEDGE --> GROUND
-    end
+ subgraph RAG_SPOKE [" FlowPilot RAG Spoke -- flowpilot-rag-service"]
+ direction LR
+ KNOWLEDGE["Knowledge layer\nQdrant dense + sparse vectors\nLangChain retrieval chains"]
+ GROUND["Grounding pipeline\nconfidence gate . guardrails\ncite or block"]
+ KNOWLEDGE --> GROUND
+ end
 
-    subgraph AGENT_SPOKE ["≡ƒƒú FlowPilot Agent Spoke — flowpilot-vendor-onboarding"]
-        direction LR
-        ORCH["Agent Orchestrator\nLangGraph 5-node state machine\ncollect → retrieve → assess → approve → complete"]
-        HITL_NODE["HITL Gate\nagent pauses\nhuman decision required"]
-        ORCH --> HITL_NODE
-    end
+ subgraph AGENT_SPOKE [" FlowPilot Agent Spoke -- flowpilot-vendor-onboarding"]
+ direction LR
+ ORCH["Agent Orchestrator\nLangGraph 5-node state machine\ncollect -> retrieve -> assess -> approve -> complete"]
+ HITL_NODE["HITL Gate\nagent pauses\nhuman decision required"]
+ ORCH --> HITL_NODE
+ end
 
-    subgraph HITL_SPOKE ["≡ƒæñ Human-in-the-Loop Spoke"]
-        APPROVER["Security Approver\nApproval queue UI\nPOST /workflows/id/approve"]
-        AUDIT["Audit trail\n11 event types · trace_id\nfull decision chain"]
-    end
+ subgraph HITL_SPOKE [" Human-in-the-Loop Spoke"]
+ APPROVER["Security Approver\nApproval queue UI\nPOST /workflows/id/approve"]
+ AUDIT["Audit trail\n11 event types . trace_id\nfull decision chain"]
+ end
 
-    subgraph FRONTEND ["≡ƒûÑ∩╕Å Frontend"]
-        UI["FlowPilot UI\nReact 18 · Vite · Tailwind\n9 scenes · role-aware"]
-    end
+ subgraph FRONTEND [" Frontend"]
+ UI["FlowPilot UI\nReact 18 . Vite . Tailwind\n9 scenes . role-aware"]
+ end
 
-    UI --> APIM
-    APIM --> AGENT_SPOKE
-    APIM --> RAG_SPOKE
-    APIM --> ENTRA
+ UI --> APIM
+ APIM --> AGENT_SPOKE
+ APIM --> RAG_SPOKE
+ APIM --> ENTRA
 
-    ORCH -- "POST /query + trace_id" --> GROUND
-    ORCH --> OAI
-    KNOWLEDGE --> OAI
+ ORCH -- "POST /query + trace_id" --> GROUND
+ ORCH --> OAI
+ KNOWLEDGE --> OAI
 
-    HITL_NODE --> APPROVER
-    APPROVER --> AUDIT
+ HITL_NODE --> APPROVER
+ APPROVER --> AUDIT
 
-    RAG_SPOKE --> EVAL
-    AGENT_SPOKE --> EVAL
-    ENTRA -- "JWT · RBAC" --> APIM
+ RAG_SPOKE --> EVAL
+ AGENT_SPOKE --> EVAL
+ ENTRA -- "JWT . RBAC" --> APIM
 ```
 
 ## Mapping to Azure AI Reference Architecture
-
 
 | Azure AI Hub/Spoke pattern | FlowPilot component | Notes |
 |---|---|---|
@@ -376,34 +375,34 @@ graph TD
 
 ```mermaid
 sequenceDiagram
-    actor Sarah as ≡ƒæñ sarah.chen<br/>(procurement_manager)
-    actor Michael as ≡ƒæñ michael.davidson<br/>(security_approver)
-    participant UI as FlowPilot UI
-    participant KC as Keycloak 24
-    participant AGENT as vendor-onboarding<br/>LangGraph Agent
-    participant RAG as rag-service<br/>Hybrid Retrieval
-    participant OAI as OpenAI<br/>GPT-4o
+ actor Sarah as sarah.chen<br/>(procurement_manager)
+ actor Michael as michael.davidson<br/>(security_approver)
+ participant UI as FlowPilot UI
+ participant KC as Keycloak 24
+ participant AGENT as vendor-onboarding<br/>LangGraph Agent
+ participant RAG as rag-service<br/>Hybrid Retrieval
+ participant OAI as OpenAI<br/>GPT-4o
 
-    Sarah->>KC: Login (OIDC Auth Code Flow)
-    KC-->>UI: JWT Bearer · role: procurement_manager
-    Sarah->>UI: Submit vendor onboarding request
-    UI->>AGENT: POST /workflows/ + Bearer JWT
-    Note over AGENT: Γ£ª trace_id generated<br/>≡ƒôï workflow.created emitted
-    AGENT->>RAG: POST /query + X-Trace-ID header
-    Note over RAG: ≡ƒôï rag.query.initiated emitted
-    RAG->>OAI: Embed query (text-embedding-3-large)
-    OAI-->>RAG: Dense vector
-    RAG-->>AGENT: Grounded response + avg_score + trace_id
-    Note over RAG: ≡ƒôï rag.query.completed emitted
-    AGENT->>OAI: GPT-4o · security risk assessment
-    Note over AGENT: ≡ƒôï security.findings.generated emitted<br/>≡ƒôï workflow.routed emitted
-    Note over AGENT: ΓÅ╕ HITL GATE — agent pauses
-    Michael->>KC: Login (account switch)
-    KC-->>UI: JWT Bearer · role: security_approver
-    UI->>AGENT: POST /workflows/{id}/approve + Bearer
-    Note over AGENT: ≡ƒôï approval.decision.submitted emitted<br/>≡ƒôï workflow.completed emitted
-    UI->>AGENT: GET /workflows/{id}/events + Bearer
-    AGENT-->>UI: 11 events · all correlated by trace_id
+ Sarah->>KC: Login (OIDC Auth Code Flow)
+ KC-->>UI: JWT Bearer . role: procurement_manager
+ Sarah->>UI: Submit vendor onboarding request
+ UI->>AGENT: POST /workflows/ + Bearer JWT
+ Note over AGENT: trace_id generated<br/> workflow.created emitted
+ AGENT->>RAG: POST /query + X-Trace-ID header
+ Note over RAG: rag.query.initiated emitted
+ RAG->>OAI: Embed query (text-embedding-3-large)
+ OAI-->>RAG: Dense vector
+ RAG-->>AGENT: Grounded response + avg_score + trace_id
+ Note over RAG: rag.query.completed emitted
+ AGENT->>OAI: GPT-4o . security risk assessment
+ Note over AGENT: security.findings.generated emitted<br/> workflow.routed emitted
+ Note over AGENT: PAUSED HITL GATE -- agent pauses
+ Michael->>KC: Login (account switch)
+ KC-->>UI: JWT Bearer . role: security_approver
+ UI->>AGENT: POST /workflows/{id}/approve + Bearer
+ Note over AGENT: approval.decision.submitted emitted<br/> workflow.completed emitted
+ UI->>AGENT: GET /workflows/{id}/events + Bearer
+ AGENT-->>UI: 11 events . all correlated by trace_id
 ```
 
 ---
@@ -412,7 +411,7 @@ sequenceDiagram
 
 | Metric | What it means | Target |
 |---|---|---|
-| `avg_score` | Average similarity score of retrieved chunks (0ΓÇô1) | > 0.65 |
+| `avg_score` | Average similarity score of retrieved chunks (0–1) | > 0.65 |
 | `confidence_met` | Whether avg_score exceeded the confidence threshold | `true` |
 | `results_count` | Number of chunks returned (top-k) | 5 |
 | `latency_ms` | Total retrieval + LLM grounding time | < 3000ms |
@@ -424,7 +423,7 @@ sequenceDiagram
 
 | Mechanism | Implementation |
 |---|---|
-| **Retry** | Exponential backoff with jitter — 500ms initial, ├ù2 multiplier, max 3 attempts |
+| **Retry** | Exponential backoff with jitter — 500ms initial, ×2 multiplier, max 3 attempts |
 | **Dead-letter** | Failed steps written to SQLite dead-letter table with full execution context |
 | **Compensating actions** | Approval timeout triggers stakeholder notification and state revert |
 | **Degraded mode** | RAG unavailable → structured questionnaire fallback, flagged in log and UI |
@@ -437,21 +436,21 @@ sequenceDiagram
 
 | Capability | Status |
 |---|---|
-| RAG retrieval (hybrid RRF, confidence gate) | Γ£à Implemented |
-| Agentic state machine (LangGraph, 5 nodes) | Γ£à Implemented |
-| HITL approval gate | Γ£à Implemented |
-| RBAC enforcement (Keycloak OIDC, JWT) | Γ£à Implemented |
-| Audit trail (11 event types, trace_id) | Γ£à Implemented |
-| Operational resilience (retry, dead-letter, degraded mode) | Γ£à Implemented |
-| Idempotency guarantees | Γ£à Implemented |
-| Workflow checkpoint recovery | Γ£à Implemented |
-| Structured JSON logging (structlog) | Γ£à Implemented |
-| Policy document management UI | ≡ƒöä In progress |
-| Evaluation pipeline (retrieval quality, LLM output) | ≡ƒôï Planned |
-| Multi-tenancy isolation | ≡ƒôï Planned |
-| Operational SLIs/SLOs | ≡ƒôï Planned |
-| Cost governance (token budget, per-workflow tracking) | ≡ƒôï Planned |
-| Production infrastructure (AKS, APIM, ingress) | ≡ƒôï Planned |
+| RAG retrieval (hybrid RRF, confidence gate) | ✅ Implemented |
+| Agentic state machine (LangGraph, 5 nodes) | ✅ Implemented |
+| HITL approval gate | ✅ Implemented |
+| RBAC enforcement (Keycloak OIDC, JWT) | ✅ Implemented |
+| Audit trail (11 event types, trace_id) | ✅ Implemented |
+| Operational resilience (retry, dead-letter, degraded mode) | ✅ Implemented |
+| Idempotency guarantees | ✅ Implemented |
+| Workflow checkpoint recovery | ✅ Implemented |
+| Structured JSON logging (structlog) | ✅ Implemented |
+| Policy document management UI | 🔑 In progress |
+| Evaluation pipeline (retrieval quality, LLM output) | 📊 Planned |
+| Multi-tenancy isolation | 📊 Planned |
+| Operational SLIs/SLOs | 📊 Planned |
+| Cost governance (token budget, per-workflow tracking) | 📊 Planned |
+| Production infrastructure (AKS, APIM, ingress) | 📊 Planned |
 
 ---
 
@@ -472,18 +471,18 @@ sequenceDiagram
 
 | ADR | Layer | Decision |
 |---|---|---|
-| [ADR-001](adr/ADR-001-qdrant-over-pgvector.md) | ≡ƒö╡ RAG | Qdrant over PostgreSQL pgvector |
-| [ADR-002](adr/ADR-002-hybrid-retrieval.md) | ≡ƒö╡ RAG | Hybrid retrieval over dense-only |
-| [ADR-003](adr/ADR-003-langgraph-domain-only.md) | ≡ƒƒú Agentic AI | LangGraph restricted to domain layer |
-| [ADR-004](adr/ADR-004-hitl-platform-concern.md) | ≡ƒƒú Agentic AI | HITL as platform-level concern |
-| [ADR-005](adr/ADR-005-sqlite-workflow-state.md) | ≡ƒƒú Agentic AI | SQLite accepted for workflow state |
-| [ADR-006](adr/ADR-006-fastapi-over-spring-boot.md) | ≡ƒƒó Shared | FastAPI over Spring Boot |
-| [ADR-007](adr/ADR-007-retrieval-separated-from-orchestration.md) | ≡ƒƒí Boundary | Retrieval service separated from orchestration |
-| [ADR-008](adr/ADR-008-vendor-onboarding-domain.md) | ≡ƒƒó Shared | Vendor onboarding as demonstration domain |
-| [ADR-009](adr/ADR-009-mock-mode.md) | ≡ƒƒó Shared | Mock mode for zero-friction demonstration |
-| [ADR-010](adr/ADR-010-structlog-json-logging.md) | ≡ƒƒó Shared | Structured JSON logging over traditional logging |
-| [ADR-011](adr/ADR-011-no-reranking-layer.md) | ≡ƒö╡ RAG | No dedicated reranking layer at portfolio scope |
-| [ADR-012](adr/ADR-012-keycloak-identity-provider.md) | ≡ƒƒó Shared | Keycloak as identity provider |
+| [ADR-001](adr/ADR-001-qdrant-over-pgvector.md) | 🔵 RAG | Qdrant over PostgreSQL pgvector |
+| [ADR-002](adr/ADR-002-hybrid-retrieval.md) | 🔵 RAG | Hybrid retrieval over dense-only |
+| [ADR-003](adr/ADR-003-langgraph-domain-only.md) | 🟣 Agentic AI | LangGraph restricted to domain layer |
+| [ADR-004](adr/ADR-004-hitl-platform-concern.md) | 🟣 Agentic AI | HITL as platform-level concern |
+| [ADR-005](adr/ADR-005-sqlite-workflow-state.md) | 🟣 Agentic AI | SQLite accepted for workflow state |
+| [ADR-006](adr/ADR-006-fastapi-over-spring-boot.md) | 🟠 Shared | FastAPI over Spring Boot |
+| [ADR-007](adr/ADR-007-retrieval-separated-from-orchestration.md) | 🟡 Boundary | Retrieval service separated from orchestration |
+| [ADR-008](adr/ADR-008-vendor-onboarding-domain.md) | 🟠 Shared | Vendor onboarding as demonstration domain |
+| [ADR-009](adr/ADR-009-mock-mode.md) | 🟠 Shared | Mock mode for zero-friction demonstration |
+| [ADR-010](adr/ADR-010-structlog-json-logging.md) | 🟠 Shared | Structured JSON logging over traditional logging |
+| [ADR-011](adr/ADR-011-no-reranking-layer.md) | 🔵 RAG | No dedicated reranking layer at portfolio scope |
+| [ADR-012](adr/ADR-012-keycloak-identity-provider.md) | 🟠 Shared | Keycloak as identity provider |
 
 ---
 
@@ -504,7 +503,7 @@ sequenceDiagram
 
 | Repository | Purpose |
 |---|---|
-| **flowpilot-docs** ΓåÉ *you are here* | Architecture docs: C4 diagrams, 12 ADRs, governance model, sequence diagrams |
+| **flowpilot-docs** ← *you are here* | Architecture docs: C4 diagrams, 12 ADRs, governance model, sequence diagrams |
 | [flowpilot-rag-service](https://github.com/nitindra-soekhai/flowpilot-rag-service) | RAG: PDF ingestion, hybrid retrieval, grounding pipeline, guardrails |
 | [flowpilot-vendor-onboarding](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding) | Agentic AI: LangGraph state machine, HITL approval gate, SQLite state |
 | [flowpilot-ui](https://github.com/nitindra-soekhai/flowpilot-ui) | React 18 UI: 9 scenes, Keycloak OIDC, approval queue, audit trail |
@@ -542,6 +541,8 @@ cd flowpilot-ui && npm run dev                       # Terminal 3 → http://loc
 `FP_MOCK_MODE=true` — no OpenAI key required. Full workflow, observability, and resilience demonstrable without API cost.
 
 ---
+
+*FlowPilot · NSCS B.V. · Built by Nitindra Soekhai · May 2026*
 ## Release History
 
 | Release | What it demonstrates |
@@ -555,4 +556,4 @@ cd flowpilot-ui && npm run dev                       # Terminal 3 → http://loc
 ---
 
 
-*FlowPilot — NSCS B.V. — Built by Nitindra Soekhai — May 2026*
+*FlowPilot · NSCS B.V. · Built by Nitindra Soekhai · May 2026*
