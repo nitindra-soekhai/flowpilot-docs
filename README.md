@@ -6,12 +6,11 @@
 
 **The vendor onboarding workflow is the demonstration domain. FlowPilot is the platform.**
 
-| | Repository | Build |
+| Repository | Role | Build |
 |---|---|---|
-| RAG Service | `flowpilot-rag-service` | [![CI](https://github.com/nitindra-soekhai/flowpilot-rag-service/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/nitindra-soekhai/flowpilot-rag-service/actions) |
-| Agentic AI | `flowpilot-vendor-onboarding` | [![CI](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding/actions) |
-| Frontend | `flowpilot-ui` | [![CI](https://github.com/nitindra-soekhai/flowpilot-ui/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/nitindra-soekhai/flowpilot-ui/actions) |
-| Docs | `flowpilot-docs` | [![Docs](https://img.shields.io/badge/docs-live-blue)](https://github.com/nitindra-soekhai/flowpilot-docs) |
+| `flowpilot-rag-service` | RAG — hybrid retrieval, grounding pipeline | [![CI](https://github.com/nitindra-soekhai/flowpilot-rag-service/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/nitindra-soekhai/flowpilot-rag-service/actions) |
+| `flowpilot-vendor-onboarding` | Agentic AI — LangGraph, HITL, SQLite state | [![CI](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding/actions) |
+| `flowpilot-docs` | Architecture — 12 ADRs, diagrams, governance | [![Docs](https://img.shields.io/badge/docs-live-brightgreen)](https://github.com/nitindra-soekhai/flowpilot-docs) |
 
 ---
 
@@ -545,8 +544,6 @@ cd flowpilot-ui && npm run dev                       # Terminal 3 → http://loc
 `FP_MOCK_MODE=true` — no OpenAI key required. Full workflow, observability, and resilience demonstrable without API cost.
 
 ---
-
-*FlowPilot · NSCS B.V. · Built by Nitindra Soekhai · May 2026*
 ## Release History
 
 | Release | What it demonstrates |
