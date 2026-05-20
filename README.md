@@ -172,68 +172,7 @@ Agentic AI applied where determinism suffices produces unpredictable, ungovernab
 
 ### Two AI Paradigms — Explicitly Separated
 
-```mermaid
-flowchart TD
- classDef rag fill:#0e7490,stroke:#06b6d4,color:#fff
- classDef agentic fill:#7c3aed,stroke:#8b5cf6,color:#fff
- classDef hitl fill:#b45309,stroke:#f59e0b,color:#fff
- classDef shared fill:#1d4ed8,stroke:#3b82f6,color:#fff
- classDef done fill:#065f46,stroke:#10b981,color:#fff
- classDef blocked fill:#7f1d1d,stroke:#ef4444,color:#fff
-
- UI(["FlowPilot UI\nReact 18 . Vite . Tailwind . Port 3000"])
- KC(["Keycloak 24\nOIDC Identity Provider . Port 8080"])
-
- UI -- "OIDC Auth Code Flow" --> KC
- KC -- "JWT Bearer Token" --> UI
-
- subgraph RAG ["RAG Paradigm -- flowpilot-rag-service . Port 8000 . Stateless . Domain-agnostic"]
- direction LR
- INGEST["PDF Ingest\nLangChain loader + splitter"]
- EMBED["OpenAI\ntext-embedding-3-large"]
- QDRANT[(" Qdrant\nDense + Sparse Vectors")]
- HYBRID["Hybrid RRF Fusion\n0.7 dense . 0.3 sparse"]
- CONF{"Confidence Gate\navg_score >= 0.65"}
- GUARD["Grounding Pipeline\n+ AI Guardrails"]
- BLOCKED(["Low confidence"])
-
- INGEST --> EMBED --> QDRANT
- QDRANT --> HYBRID --> CONF
- CONF -- "pass" --> GUARD
- CONF -- "fail" --> BLOCKED
- end
-
- subgraph AGENT ["Agentic AI Paradigm -- flowpilot-vendor-onboarding . Port 8001 . Stateful . LangGraph"]
- direction TB
- N1["collect_vendor_info"]
- N2["retrieve_policies"]
- N3["assess_risk\nOpenAI GPT-4o"]
- N4[/"request_approval\nHITL GATE -- agent pauses"/]
- N5(["complete\n11 audit events . SQLite state"])
-
- N1 --> N2 --> N3 --> N4
- N4 -- "Human decision required" --> N5
- end
-
- OAI(["OpenAI Platform\nGPT-4o . text-embedding-3-large"])
-
- UI -- "POST /workflows/ + Bearer" --> AGENT
- N2 -- "POST /query" --> GUARD
- GUARD -- "grounded response + avg_score + trace_id" --> N2
- N3 --> OAI
- EMBED --> OAI
-
- class INGEST,EMBED,QDRANT,HYBRID,CONF,GUARD rag
- class N1,N2,N3 agentic
- class N4 hitl
- class N5 done
- class BLOCKED blocked
- class UI,KC,OAI shared
-
- style RAG fill:#fffde7,stroke:#aaaa33
- style AGENT fill:#fffde7,stroke:#aaaa33
- linkStyle 13,14 stroke:#eab308,stroke-width:3px
-```
+![Two AI Paradigms](docs/images/two-ai-paradigms.jpg)
 
 ### Architecture Diagrams
 
@@ -247,93 +186,7 @@ flowchart TD
 
 > **Current scope:** Local Docker Compose. The production architecture below documents the target deployment — demonstrating infrastructure thinking beyond the portfolio implementation.
 
-```mermaid
-flowchart TB
- classDef rag fill:#0e7490,stroke:#06b6d4,color:#fff
- classDef agentic fill:#7c3aed,stroke:#8b5cf6,color:#fff
- classDef hitl fill:#b45309,stroke:#f59e0b,color:#fff
- classDef shared fill:#1d4ed8,stroke:#3b82f6,color:#fff
-
- Browser(["Browser / React UI"]):::shared
-
- subgraph IDENTITY ["Identity -- Keycloak 24"]
- KC["OIDC . OAuth2 . JWT issuer\nRBAC . realm: flowpilot"]:::shared
- end
-
- subgraph AI_BACKENDS ["AI Backends"]
- OAI["OpenAI Platform\nGPT-4o . text-embedding-3-large"]:::shared
- end
-
- subgraph HUB ["AI Gateway HUB -- Azure API Management"]
- APIM["JWT validation . RBAC . Rate limiting\nAPI versioning . Token cost governance\n/api/rag . /api/workflow . /auth"]:::shared
- OBS["Observability\nApp Insights . trace_id . Log Analytics"]:::shared
- end
-
- subgraph RAG_SPOKE ["RAG Spoke -- flowpilot-rag-service . AKS . 2 replicas"]
- RAG["FastAPI . LangChain\nHybrid RRF . Confidence gate . Guardrails"]:::rag
- QD[("Qdrant\nStatefulSet . PVC\ndense + sparse vectors")]:::rag
- RAG --> QD
- end
-
- subgraph AGENT_SPOKE ["Agentic Spoke -- flowpilot-vendor-onboarding . AKS . 2 replicas"]
- ONB["FastAPI . LangGraph\n5-node state machine . HITL gate\nRetry . dead-letter . idempotency"]:::agentic
- WF[("SQLite -> PostgreSQL\nWorkflow state . Audit events")]:::agentic
- ONB --> WF
- end
-
- subgraph DATA ["Data Layer"]
- PG[("Azure PostgreSQL\nKeycloak . workflow state")]:::shared
- BLOB[("Azure Blob Storage\nPolicy documents")]:::shared
- KV["Azure Key Vault\nSecrets via CSI driver"]:::shared
- end
-
- subgraph CICD ["CI/CD -- GitHub Actions"]
- GHA["build . test . docker push GHCR"]:::shared
- K8S["kubectl apply . AKS rolling deploy"]:::shared
- GHA --> K8S
- end
-
- subgraph SECURITY ["Security & Governance"]
- SEN["Azure Sentinel"]:::hitl
- POL["Azure Policy"]:::hitl
- DEF["Defender for Cloud"]:::hitl
- end
-
- Browser -- "OIDC Auth Code" --> IDENTITY
- Browser -- "Bearer JWT" --> HUB
- IDENTITY --> HUB
- AI_BACKENDS --> RAG_SPOKE
- AI_BACKENDS --> AGENT_SPOKE
-
- HUB -- "/api/rag/*" --> RAG_SPOKE
- HUB -- "/api/workflow/*" --> AGENT_SPOKE
-
- AGENT_SPOKE -- "POST /query + trace_id" --> RAG_SPOKE
-
- RAG_SPOKE --> DATA
- AGENT_SPOKE --> DATA
- IDENTITY --> PG
-
- RAG_SPOKE --> OBS
- AGENT_SPOKE --> OBS
-
- CICD --> AGENT_SPOKE
- CICD --> RAG_SPOKE
-
- SECURITY -.-> HUB
- SECURITY -.-> RAG_SPOKE
- SECURITY -.-> AGENT_SPOKE
-
- style IDENTITY fill:#fffde7,stroke:#aaaa33
- style AI_BACKENDS fill:#fffde7,stroke:#aaaa33
- style HUB fill:#fffde7,stroke:#aaaa33
- style RAG_SPOKE fill:#fffde7,stroke:#aaaa33
- style AGENT_SPOKE fill:#fffde7,stroke:#aaaa33
- style DATA fill:#fffde7,stroke:#aaaa33
- style CICD fill:#fffde7,stroke:#aaaa33
- style SECURITY fill:#fffde7,stroke:#aaaa33
- linkStyle 10 stroke:#eab308,stroke-width:3px
-```
+![Deployment Architecture](docs/images/deployment-architecture.jpg)
 
 | Decision | Rationale |
 |---|---|
@@ -349,75 +202,7 @@ flowchart TB
 
 FlowPilot is designed to operate as a **spoke** in the Microsoft Azure AI Foundry Hub/Spoke reference architecture. Each FlowPilot component maps directly onto a recognised pattern in that ecosystem.
 
-```mermaid
-graph TD
- classDef rag fill:#0e7490,stroke:#06b6d4,color:#fff
- classDef agentic fill:#7c3aed,stroke:#8b5cf6,color:#fff
- classDef hitl fill:#b45309,stroke:#f59e0b,color:#fff
- classDef shared fill:#1d4ed8,stroke:#3b82f6,color:#fff
-
- subgraph BACKENDS ["Central AI Backends"]
- OAI["Azure OpenAI\nGPT-4o . text-embedding-3-large"]:::shared
- AIS["Azure AI Search\nalternative retrieval backend"]:::shared
- end
-
- subgraph HUB ["AI Gateway HUB -- AI Governance Layer"]
- APIM["API Management\nJWT validation . RBAC . rate limiting\ncost governance . usage ingestion"]:::shared
- EVAL["Central AI Evaluation\nApp Insights . Log Analytics\ntrace_id . AI quality metrics"]:::shared
- end
-
- subgraph IAM ["Identity"]
- ENTRA["Entra ID\nproduction scope\n-> Keycloak 24 at portfolio scope"]:::shared
- end
-
- subgraph RAG_SPOKE ["FlowPilot RAG Spoke -- flowpilot-rag-service"]
- direction LR
- KNOWLEDGE["Knowledge layer\nQdrant dense + sparse vectors\nLangChain retrieval chains"]:::rag
- GROUND["Grounding pipeline\nconfidence gate . guardrails\ncite or block"]:::rag
- KNOWLEDGE --> GROUND
- end
-
- subgraph AGENT_SPOKE ["FlowPilot Agent Spoke -- flowpilot-vendor-onboarding"]
- direction LR
- ORCH["Agent Orchestrator\nLangGraph 5-node state machine\ncollect -> retrieve -> assess -> approve -> complete"]:::agentic
- HITL_NODE["HITL Gate\nagent pauses\nhuman decision required"]:::hitl
- ORCH --> HITL_NODE
- end
-
- subgraph HITL_SPOKE ["Human-in-the-Loop Spoke"]
- APPROVER["Security Approver\nApproval queue UI\nPOST /workflows/id/approve"]:::hitl
- AUDIT["Audit trail\n11 event types . trace_id\nfull decision chain"]:::hitl
- end
-
- subgraph FRONTEND ["Frontend"]
- UI["FlowPilot UI\nReact 18 . Vite . Tailwind\n9 scenes . role-aware"]:::shared
- end
-
- UI --> APIM
- APIM --> AGENT_SPOKE
- APIM --> RAG_SPOKE
- APIM --> ENTRA
-
- ORCH -- "POST /query + trace_id" --> GROUND
- ORCH --> OAI
- KNOWLEDGE --> OAI
-
- HITL_NODE --> APPROVER
- APPROVER --> AUDIT
-
- RAG_SPOKE --> EVAL
- AGENT_SPOKE --> EVAL
- ENTRA -- "JWT . RBAC" --> APIM
-
- style BACKENDS fill:#fffde7,stroke:#aaaa33
- style HUB fill:#fffde7,stroke:#aaaa33
- style IAM fill:#fffde7,stroke:#aaaa33
- style RAG_SPOKE fill:#fffde7,stroke:#aaaa33
- style AGENT_SPOKE fill:#fffde7,stroke:#aaaa33
- style HITL_SPOKE fill:#fffde7,stroke:#aaaa33
- style FRONTEND fill:#fffde7,stroke:#aaaa33
- linkStyle 6 stroke:#eab308,stroke-width:3px
-```
+![FlowPilot in Azure AI Hub/Spoke](docs/images/azure-hub-spoke.jpg)
 
 ## Mapping to Azure AI Reference Architecture
 
@@ -448,37 +233,7 @@ graph TD
 
 ## Traceability — Every AI Decision Is Reconstructable
 
-```mermaid
-sequenceDiagram
- actor Sarah as sarah.chen<br/>(procurement_manager)
- actor Michael as michael.davidson<br/>(security_approver)
- participant UI as FlowPilot UI
- participant KC as Keycloak 24
- participant AGENT as vendor-onboarding<br/>LangGraph Agent
- participant RAG as rag-service<br/>Hybrid Retrieval
- participant OAI as OpenAI<br/>GPT-4o
-
- Sarah->>KC: Login (OIDC Auth Code Flow)
- KC-->>UI: JWT Bearer . role: procurement_manager
- Sarah->>UI: Submit vendor onboarding request
- UI->>AGENT: POST /workflows/ + Bearer JWT
- Note over AGENT: trace_id generated<br/>workflow.created emitted
- AGENT->>RAG: POST /query + X-Trace-ID header
- Note over RAG: rag.query.initiated emitted
- RAG->>OAI: Embed query (text-embedding-3-large)
- OAI-->>RAG: Dense vector
- RAG-->>AGENT: Grounded response + avg_score + trace_id
- Note over RAG: rag.query.completed emitted
- AGENT->>OAI: GPT-4o . security risk assessment
- Note over AGENT: security.findings.generated emitted<br/>workflow.routed emitted
- Note over AGENT: HITL GATE -- agent pauses
- Michael->>KC: Login (account switch)
- KC-->>UI: JWT Bearer . role: security_approver
- UI->>AGENT: POST /workflows/{id}/approve + Bearer
- Note over AGENT: approval.decision.submitted emitted<br/>workflow.completed emitted
- UI->>AGENT: GET /workflows/{id}/events + Bearer
- AGENT-->>UI: 11 events . all correlated by trace_id
-```
+![Traceability Sequence](docs/images/traceability.jpg)
 
 ---
 
