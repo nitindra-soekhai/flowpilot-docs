@@ -168,6 +168,25 @@ Agentic AI applied where determinism suffices produces unpredictable, ungovernab
 
 ---
 
+## Architecture Decision Records
+
+| ADR | Layer | Decision |
+|---|---|---|
+| [ADR-001](adr/ADR-001-qdrant-over-pgvector.md) | 🔵 RAG | Qdrant over PostgreSQL pgvector |
+| [ADR-002](adr/ADR-002-hybrid-retrieval.md) | 🔵 RAG | Hybrid retrieval over dense-only |
+| [ADR-003](adr/ADR-003-langgraph-domain-only.md) | 🟣 Agentic AI | LangGraph restricted to domain layer |
+| [ADR-004](adr/ADR-004-hitl-platform-concern.md) | 🟣 Agentic AI | HITL as platform-level concern |
+| [ADR-005](adr/ADR-005-sqlite-workflow-state.md) | 🟣 Agentic AI | SQLite accepted for workflow state |
+| [ADR-006](adr/ADR-006-fastapi-over-spring-boot.md) | 🟠 Shared | FastAPI over Spring Boot |
+| [ADR-007](adr/ADR-007-retrieval-separated-from-orchestration.md) | 🟡 Boundary | Retrieval service separated from orchestration |
+| [ADR-008](adr/ADR-008-vendor-onboarding-domain.md) | 🟠 Shared | Vendor onboarding as demonstration domain |
+| [ADR-009](adr/ADR-009-mock-mode.md) | 🟠 Shared | Mock mode for zero-friction demonstration |
+| [ADR-010](adr/ADR-010-structlog-json-logging.md) | 🟠 Shared | Structured JSON logging over traditional logging |
+| [ADR-011](adr/ADR-011-no-reranking-layer.md) | 🔵 RAG | No dedicated reranking layer at portfolio scope |
+| [ADR-012](adr/ADR-012-keycloak-identity-provider.md) | 🟠 Shared | Keycloak as identity provider |
+
+---
+
 ## Architecture
 
 ### Two AI Paradigms — Explicitly Separated
@@ -294,25 +313,6 @@ FlowPilot is designed to operate as a **spoke** in the Microsoft Azure AI Foundr
 - **AKS deployment** — documented production target, not yet automated. Terraform + Kubernetes manifests are the next infrastructure milestone
 - **Evaluation framework** — retrieval scoring (`avg_score`, `confidence_met`, `latency_ms`) visible in the audit trail. Formal LLM output evaluation pipeline is planned
 - **Intentionally optimises clarity over scale** — this is a portfolio demonstrating architectural thinking. Production hardening is the documented next phase, not a gap in understanding
-
----
-
-## Architecture Decision Records
-
-| ADR | Layer | Decision |
-|---|---|---|
-| [ADR-001](adr/ADR-001-qdrant-over-pgvector.md) | 🔵 RAG | Qdrant over PostgreSQL pgvector |
-| [ADR-002](adr/ADR-002-hybrid-retrieval.md) | 🔵 RAG | Hybrid retrieval over dense-only |
-| [ADR-003](adr/ADR-003-langgraph-domain-only.md) | 🟣 Agentic AI | LangGraph restricted to domain layer |
-| [ADR-004](adr/ADR-004-hitl-platform-concern.md) | 🟣 Agentic AI | HITL as platform-level concern |
-| [ADR-005](adr/ADR-005-sqlite-workflow-state.md) | 🟣 Agentic AI | SQLite accepted for workflow state |
-| [ADR-006](adr/ADR-006-fastapi-over-spring-boot.md) | 🟠 Shared | FastAPI over Spring Boot |
-| [ADR-007](adr/ADR-007-retrieval-separated-from-orchestration.md) | 🟡 Boundary | Retrieval service separated from orchestration |
-| [ADR-008](adr/ADR-008-vendor-onboarding-domain.md) | 🟠 Shared | Vendor onboarding as demonstration domain |
-| [ADR-009](adr/ADR-009-mock-mode.md) | 🟠 Shared | Mock mode for zero-friction demonstration |
-| [ADR-010](adr/ADR-010-structlog-json-logging.md) | 🟠 Shared | Structured JSON logging over traditional logging |
-| [ADR-011](adr/ADR-011-no-reranking-layer.md) | 🔵 RAG | No dedicated reranking layer at portfolio scope |
-| [ADR-012](adr/ADR-012-keycloak-identity-provider.md) | 🟠 Shared | Keycloak as identity provider |
 
 ---
 
