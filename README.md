@@ -66,6 +66,32 @@ The screenshots below show the complete end-to-end flow across both user roles. 
 
 ---
 
+## AI Development Team
+
+FlowPilot explores governed multi-agent collaboration patterns for enterprise AI delivery, operations, onboarding workflows, governance, and platform engineering.
+
+13 specialist agents operate under Nitindra Soekhai's direction with Claude as coordinator — orchestrating, reviewing, and gating all output before it surfaces. Nothing reaches Nitindra without passing the internal review gate. This is governed collaboration, not autonomous AI.
+
+![AI Development Team](docs/images/agent-team-org.jpg)
+
+| Domain | Agent | Responsibility |
+|---|---|---|
+| Engineering | Enterprise Retrieval agent | flowpilot-rag-service — grounding, retrieval, optimization |
+| Engineering | Vendor Onboarding agent | flowpilot-vendor-onboarding — orchestration, approvals, workflow |
+| Quality | Security agent | RBAC, OIDC, OWASP, GDPR, ISO 27001 |
+| Quality | QA agent | pytest, Playwright, coverage gates |
+| Operations | Infra agent | Azure reference architecture, Terraform readiness |
+| Operations | DevOps agent | GitHub Actions, CI/CD, Docker build pipeline |
+| Platform | Frontend Experience agent | React UI — components, scenes, UX |
+| Platform | Middleware agent | Messaging, middleware, integration patterns |
+| Data | Database agent | DBA, schema, migrations |
+| Data | MLOps agent | Retrieval metrics, LLM ops, token costs |
+| Insight | Analyst agent | Functional scope, business requirements |
+| Insight | Architecture Knowledge agent | ADRs, C4 diagrams, architecture documentation |
+| Insight | Analytics agent | Dashboards, boards, statistics |
+
+---
+
 ## Why This Architecture?
 
 This section explains the decisions that distinguish architectural thinking from engineering execution.
@@ -203,6 +229,10 @@ flowchart TD
  class N5 done
  class BLOCKED blocked
  class UI,KC,OAI shared
+
+ style RAG fill:#fffde7,stroke:#aaaa33
+ style AGENT fill:#fffde7,stroke:#aaaa33
+ linkStyle 13,14 stroke:#eab308,stroke-width:3px
 ```
 
 ### Architecture Diagrams
@@ -219,49 +249,54 @@ flowchart TD
 
 ```mermaid
 flowchart TB
- Browser(["Browser / React UI"])
+ classDef rag fill:#0e7490,stroke:#06b6d4,color:#fff
+ classDef agentic fill:#7c3aed,stroke:#8b5cf6,color:#fff
+ classDef hitl fill:#b45309,stroke:#f59e0b,color:#fff
+ classDef shared fill:#1d4ed8,stroke:#3b82f6,color:#fff
+
+ Browser(["Browser / React UI"]):::shared
 
  subgraph IDENTITY ["Identity -- Keycloak 24"]
- KC["OIDC . OAuth2 . JWT issuer\nRBAC . realm: flowpilot"]
+ KC["OIDC . OAuth2 . JWT issuer\nRBAC . realm: flowpilot"]:::shared
  end
 
  subgraph AI_BACKENDS ["AI Backends"]
- OAI["OpenAI Platform\nGPT-4o . text-embedding-3-large"]
+ OAI["OpenAI Platform\nGPT-4o . text-embedding-3-large"]:::shared
  end
 
  subgraph HUB ["AI Gateway HUB -- Azure API Management"]
- APIM["JWT validation . RBAC . Rate limiting\nAPI versioning . Token cost governance\n/api/rag . /api/workflow . /auth"]
- OBS["Observability\nApp Insights . trace_id . Log Analytics"]
+ APIM["JWT validation . RBAC . Rate limiting\nAPI versioning . Token cost governance\n/api/rag . /api/workflow . /auth"]:::shared
+ OBS["Observability\nApp Insights . trace_id . Log Analytics"]:::shared
  end
 
  subgraph RAG_SPOKE ["RAG Spoke -- flowpilot-rag-service . AKS . 2 replicas"]
- RAG["FastAPI . LangChain\nHybrid RRF . Confidence gate . Guardrails"]
- QD[("Qdrant\nStatefulSet . PVC\ndense + sparse vectors")]
+ RAG["FastAPI . LangChain\nHybrid RRF . Confidence gate . Guardrails"]:::rag
+ QD[("Qdrant\nStatefulSet . PVC\ndense + sparse vectors")]:::rag
  RAG --> QD
  end
 
  subgraph AGENT_SPOKE ["Agentic Spoke -- flowpilot-vendor-onboarding . AKS . 2 replicas"]
- ONB["FastAPI . LangGraph\n5-node state machine . HITL gate\nRetry . dead-letter . idempotency"]
- WF[("SQLite -> PostgreSQL\nWorkflow state . Audit events")]
+ ONB["FastAPI . LangGraph\n5-node state machine . HITL gate\nRetry . dead-letter . idempotency"]:::agentic
+ WF[("SQLite -> PostgreSQL\nWorkflow state . Audit events")]:::agentic
  ONB --> WF
  end
 
  subgraph DATA ["Data Layer"]
- PG[("Azure PostgreSQL\nKeycloak . workflow state")]
- BLOB[("Azure Blob Storage\nPolicy documents")]
- KV["Azure Key Vault\nSecrets via CSI driver"]
+ PG[("Azure PostgreSQL\nKeycloak . workflow state")]:::shared
+ BLOB[("Azure Blob Storage\nPolicy documents")]:::shared
+ KV["Azure Key Vault\nSecrets via CSI driver"]:::shared
  end
 
  subgraph CICD ["CI/CD -- GitHub Actions"]
- GHA["build . test . docker push GHCR"]
- K8S["kubectl apply . AKS rolling deploy"]
+ GHA["build . test . docker push GHCR"]:::shared
+ K8S["kubectl apply . AKS rolling deploy"]:::shared
  GHA --> K8S
  end
 
  subgraph SECURITY ["Security & Governance"]
- SEN["Azure Sentinel"]
- POL["Azure Policy"]
- DEF["Defender for Cloud"]
+ SEN["Azure Sentinel"]:::hitl
+ POL["Azure Policy"]:::hitl
+ DEF["Defender for Cloud"]:::hitl
  end
 
  Browser -- "OIDC Auth Code" --> IDENTITY
@@ -288,6 +323,16 @@ flowchart TB
  SECURITY -.-> HUB
  SECURITY -.-> RAG_SPOKE
  SECURITY -.-> AGENT_SPOKE
+
+ style IDENTITY fill:#fffde7,stroke:#aaaa33
+ style AI_BACKENDS fill:#fffde7,stroke:#aaaa33
+ style HUB fill:#fffde7,stroke:#aaaa33
+ style RAG_SPOKE fill:#fffde7,stroke:#aaaa33
+ style AGENT_SPOKE fill:#fffde7,stroke:#aaaa33
+ style DATA fill:#fffde7,stroke:#aaaa33
+ style CICD fill:#fffde7,stroke:#aaaa33
+ style SECURITY fill:#fffde7,stroke:#aaaa33
+ linkStyle 10 stroke:#eab308,stroke-width:3px
 ```
 
 | Decision | Rationale |
@@ -306,42 +351,46 @@ FlowPilot is designed to operate as a **spoke** in the Microsoft Azure AI Foundr
 
 ```mermaid
 graph TD
+ classDef rag fill:#0e7490,stroke:#06b6d4,color:#fff
+ classDef agentic fill:#7c3aed,stroke:#8b5cf6,color:#fff
+ classDef hitl fill:#b45309,stroke:#f59e0b,color:#fff
+ classDef shared fill:#1d4ed8,stroke:#3b82f6,color:#fff
 
  subgraph BACKENDS ["Central AI Backends"]
- OAI["Azure OpenAI\nGPT-4o . text-embedding-3-large"]
- AIS["Azure AI Search\nalternative retrieval backend"]
+ OAI["Azure OpenAI\nGPT-4o . text-embedding-3-large"]:::shared
+ AIS["Azure AI Search\nalternative retrieval backend"]:::shared
  end
 
  subgraph HUB ["AI Gateway HUB -- AI Governance Layer"]
- APIM["API Management\nJWT validation . RBAC . rate limiting\ncost governance . usage ingestion"]
- EVAL["Central AI Evaluation\nApp Insights . Log Analytics\ntrace_id . AI quality metrics"]
+ APIM["API Management\nJWT validation . RBAC . rate limiting\ncost governance . usage ingestion"]:::shared
+ EVAL["Central AI Evaluation\nApp Insights . Log Analytics\ntrace_id . AI quality metrics"]:::shared
  end
 
  subgraph IAM ["Identity"]
- ENTRA["Entra ID\nproduction scope\n-> Keycloak 24 at portfolio scope"]
+ ENTRA["Entra ID\nproduction scope\n-> Keycloak 24 at portfolio scope"]:::shared
  end
 
  subgraph RAG_SPOKE ["FlowPilot RAG Spoke -- flowpilot-rag-service"]
  direction LR
- KNOWLEDGE["Knowledge layer\nQdrant dense + sparse vectors\nLangChain retrieval chains"]
- GROUND["Grounding pipeline\nconfidence gate . guardrails\ncite or block"]
+ KNOWLEDGE["Knowledge layer\nQdrant dense + sparse vectors\nLangChain retrieval chains"]:::rag
+ GROUND["Grounding pipeline\nconfidence gate . guardrails\ncite or block"]:::rag
  KNOWLEDGE --> GROUND
  end
 
  subgraph AGENT_SPOKE ["FlowPilot Agent Spoke -- flowpilot-vendor-onboarding"]
  direction LR
- ORCH["Agent Orchestrator\nLangGraph 5-node state machine\ncollect -> retrieve -> assess -> approve -> complete"]
- HITL_NODE["HITL Gate\nagent pauses\nhuman decision required"]
+ ORCH["Agent Orchestrator\nLangGraph 5-node state machine\ncollect -> retrieve -> assess -> approve -> complete"]:::agentic
+ HITL_NODE["HITL Gate\nagent pauses\nhuman decision required"]:::hitl
  ORCH --> HITL_NODE
  end
 
  subgraph HITL_SPOKE ["Human-in-the-Loop Spoke"]
- APPROVER["Security Approver\nApproval queue UI\nPOST /workflows/id/approve"]
- AUDIT["Audit trail\n11 event types . trace_id\nfull decision chain"]
+ APPROVER["Security Approver\nApproval queue UI\nPOST /workflows/id/approve"]:::hitl
+ AUDIT["Audit trail\n11 event types . trace_id\nfull decision chain"]:::hitl
  end
 
  subgraph FRONTEND ["Frontend"]
- UI["FlowPilot UI\nReact 18 . Vite . Tailwind\n9 scenes . role-aware"]
+ UI["FlowPilot UI\nReact 18 . Vite . Tailwind\n9 scenes . role-aware"]:::shared
  end
 
  UI --> APIM
@@ -359,6 +408,15 @@ graph TD
  RAG_SPOKE --> EVAL
  AGENT_SPOKE --> EVAL
  ENTRA -- "JWT . RBAC" --> APIM
+
+ style BACKENDS fill:#fffde7,stroke:#aaaa33
+ style HUB fill:#fffde7,stroke:#aaaa33
+ style IAM fill:#fffde7,stroke:#aaaa33
+ style RAG_SPOKE fill:#fffde7,stroke:#aaaa33
+ style AGENT_SPOKE fill:#fffde7,stroke:#aaaa33
+ style HITL_SPOKE fill:#fffde7,stroke:#aaaa33
+ style FRONTEND fill:#fffde7,stroke:#aaaa33
+ linkStyle 6 stroke:#eab308,stroke-width:3px
 ```
 
 ## Mapping to Azure AI Reference Architecture
