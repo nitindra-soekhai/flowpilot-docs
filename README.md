@@ -184,6 +184,7 @@ Agentic AI applied where determinism suffices produces unpredictable, ungovernab
 | [ADR-010](adr/ADR-010-structlog-json-logging.md) | 🟠 Shared | Structured JSON logging over traditional logging |
 | [ADR-011](adr/ADR-011-no-reranking-layer.md) | 🔵 RAG | No dedicated reranking layer at portfolio scope |
 | [ADR-012](adr/ADR-012-keycloak-identity-provider.md) | 🟠 Shared | Keycloak as identity provider |
+| [ADR-013](adr/ADR-013-azure-service-bus-ingestion-queue.md) | 🔵 RAG | Azure Service Bus as async ingestion queue — production-ready by design |
 
 ---
 
@@ -333,10 +334,10 @@ FlowPilot is designed to operate as a **spoke** in the Microsoft Azure AI Foundr
 
 | Repository | Purpose |
 |---|---|
-| **flowpilot-docs** ← *you are here* | Architecture docs: C4 diagrams, 12 ADRs, governance model, sequence diagrams |
-| [flowpilot-rag-service](https://github.com/nitindra-soekhai/flowpilot-rag-service) | RAG: PDF ingestion, hybrid retrieval, grounding pipeline, guardrails |
-| [flowpilot-vendor-onboarding](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding) | Agentic AI: LangGraph state machine, HITL approval gate, SQLite state |
-| [flowpilot-ui](https://github.com/nitindra-soekhai/flowpilot-ui) | React 18 UI: 9 scenes, Keycloak OIDC, approval queue, audit trail |
+| **flowpilot-docs** ← *you are here* | Architecture docs: C4 diagrams, 13 ADRs, governance model, sequence diagrams |
+| [flowpilot-rag-service](https://github.com/nitindra-soekhai/flowpilot-rag-service) | RAG: async PDF ingestion (Azure Service Bus), hybrid retrieval, grounding pipeline, guardrails |
+| [flowpilot-vendor-onboarding](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding) | Agentic AI: LangGraph state machine, HITL approval gate, vendor registry, re-assessment |
+| [flowpilot-ui](https://github.com/nitindra-soekhai/flowpilot-ui) | React 18 UI: 9 scenes + Vendor Registry + Document Management, Keycloak OIDC, audit trail |
 
 ---
 
@@ -349,6 +350,7 @@ FlowPilot is designed to operate as a **spoke** in the Microsoft Azure AI Foundr
 | Embeddings | OpenAI text-embedding-3-large |
 | LLM | OpenAI GPT-4o |
 | Agentic orchestration | LangGraph — 5-node vendor assessment state machine |
+| Async ingestion queue | Azure Service Bus (production) · FastAPI BackgroundTasks (portfolio demo) |
 | Workflow state | SQLite via aiosqlite |
 | Backend | Python / FastAPI (both services) |
 | Identity provider | Keycloak 24 — OIDC/OAuth2, Docker-hosted |
@@ -375,6 +377,7 @@ cd flowpilot-ui && npm run dev                       # Terminal 3 → http://loc
 
 | Release | What it demonstrates |
 |---|---|
+| **v1.2-knowledge-base** *(planned)* | Async ingestion queue (Azure Service Bus, ADR-013), vendor registry, re-assessment, duplicate validation, Document Management scene, 13 ADRs |
 | **v1.1-authentication-ui** | Keycloak OIDC, React UI 9 scenes, real audit trail (11 events), ADR-012 |
 | **v1.0-final** | Complete platform, all ADRs, C4 diagrams, governance model |
 | **v0.3-iteration-2** | Operational resilience, AI governance, observability complete |
