@@ -47,9 +47,14 @@ Role is extracted from the `realm_access.roles` claim in the Keycloak-issued JWT
 the same role names used in the existing RBAC model, no mapping layer required.
 
 The React UI uses the official `keycloak-js` adapter. Bearer tokens are attached to
-all API calls. The role-aware UI (Scene 3 restricted to `procurement_manager`, Scene 6
-restricted to `security_approver`) is enforced at the React component level in addition
-to the backend middleware check.
+all API calls. The role-aware UI (VendorForm restricted to `procurement_manager`,
+ApprovalQueue restricted to `security_approver`) is enforced at the React component
+level in addition to the backend middleware check.
+
+The single LandingScene at `/` exposes two CTAs ("Start vendor onboarding",
+"Go to approval queue") that call `keycloak.login({ redirectUri })` when the user
+is unauthenticated, so the post-login redirect lands the user directly on the
+target route instead of bouncing through an intermediate intro page.
 
 `FP_MOCK_MODE=true` continues to bypass JWKS validation entirely in both backends,
 preserving the zero-friction unit test path.

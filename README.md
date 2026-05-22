@@ -337,7 +337,7 @@ FlowPilot is designed to operate as a **spoke** in the Microsoft Azure AI Foundr
 | **flowpilot-docs** ← *you are here* | Architecture docs: C4 diagrams, 13 ADRs, governance model, sequence diagrams |
 | [flowpilot-rag-service](https://github.com/nitindra-soekhai/flowpilot-rag-service) | RAG: async PDF ingestion (Azure Service Bus), hybrid retrieval, grounding pipeline, guardrails |
 | [flowpilot-vendor-onboarding](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding) | Agentic AI: LangGraph state machine, HITL approval gate, vendor registry, re-assessment |
-| [flowpilot-ui](https://github.com/nitindra-soekhai/flowpilot-ui) | React 18 UI: 9 scenes + Vendor Registry + Document Management, Keycloak OIDC, audit trail |
+| [flowpilot-ui](https://github.com/nitindra-soekhai/flowpilot-ui) | React 18 UI: 8 scenes + Vendor Registry + Document Management, Keycloak OIDC, audit trail |
 
 ---
 
@@ -378,7 +378,7 @@ cd flowpilot-ui && npm run dev                       # Terminal 3 → http://loc
 | Release | What it demonstrates |
 |---|---|
 | **v1.2-knowledge-base** *(planned)* | Async ingestion queue (Azure Service Bus, ADR-013), vendor registry, re-assessment, duplicate validation, Document Management scene, 13 ADRs |
-| **v1.1-authentication-ui** | Keycloak OIDC, React UI 9 scenes, real audit trail (11 events), ADR-012 |
+| **v1.1-authentication-ui** | Keycloak OIDC, React UI 8 scenes, real audit trail (11 events), ADR-012 |
 | **v1.0-final** | Complete platform, all ADRs, C4 diagrams, governance model |
 | **v0.3-iteration-2** | Operational resilience, AI governance, observability complete |
 | **v0.2-iteration-1** | Hybrid retrieval, agentic workflow, HITL approval |
