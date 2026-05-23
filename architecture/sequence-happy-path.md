@@ -50,6 +50,16 @@ sequenceDiagram
 
     API-->>PM: 201 {workflow_id, state: PENDING_APPROVAL, next_actions: [...]}
 
+    Note over PM,API: 201 is no longer the terminal UI event.<br/>All graph events are in SQLite before 201 arrives (Option B — ADR-013).
+
+    loop Poll every 2 seconds until current_state == "pending_approval" or "complete"
+        PM->>API: GET /workflows/{id}/events?since_event_id={last_seen_id}
+        API->>DB: SELECT * FROM workflow_events WHERE workflow_id=? AND id > ? ORDER BY id ASC
+        DB-->>API: Event rows
+        API-->>PM: 200 [{id, event_type, current_state, ...}, ...]
+        Note over PM: UI renders events progressively as each poll returns
+    end
+
     Note over PM: Workflow is visible to security approver
 
     actor SA as Security Approver
