@@ -187,6 +187,7 @@ Agentic AI applied where determinism suffices produces unpredictable, ungovernab
 | [ADR-013](adr/ADR-013-event-feed-polling-over-sse.md) | 🟡 Boundary | Event feed via UI polling over SSE |
 | [ADR-014](adr/ADR-014-azure-service-bus-ingestion-queue.md) | 🔵 RAG | Azure Service Bus as async ingestion queue — production-ready by design |
 | [ADR-015](adr/ADR-015-langgraph-state-machine-over-multi-agent.md) | 🟣 Agentic AI | LangGraph state machine over autonomous multi-agent orchestration |
+| [ADR-016](adr/ADR-016-secrets-management-azure-key-vault.md) | 🟢 Shared | Azure Key Vault via Managed Identity — secrets management |
 
 ---
 
@@ -336,7 +337,7 @@ FlowPilot is designed to operate as a **spoke** in the Microsoft Azure AI Foundr
 
 | Repository | Purpose |
 |---|---|
-| **flowpilot-docs** ← *you are here* | Architecture docs: C4 diagrams, 13 ADRs, governance model, sequence diagrams |
+| **flowpilot-docs** ← *you are here* | Architecture docs: C4 diagrams, 16 ADRs, governance model, sequence diagrams |
 | [flowpilot-rag-service](https://github.com/nitindra-soekhai/flowpilot-rag-service) | RAG: async PDF ingestion (Azure Service Bus), hybrid retrieval, grounding pipeline, guardrails |
 | [flowpilot-vendor-onboarding](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding) | Agentic AI: LangGraph state machine, HITL approval gate, vendor registry, re-assessment |
 | [flowpilot-ui](https://github.com/nitindra-soekhai/flowpilot-ui) | React 18 UI: 8 scenes + Vendor Registry + Document Management, Keycloak OIDC, audit trail |
@@ -373,6 +374,8 @@ cd flowpilot-ui && npm run dev                       # Terminal 3 → http://loc
 > Credentials available on request for evaluation purposes.
 
 `FP_MOCK_MODE=true` — no OpenAI key required. Full workflow, observability, and resilience demonstrable without API cost.
+
+> ⚠️ `FP_MOCK_MODE=true` bypasses Keycloak JWT validation entirely and injects a mock user with `procurement_manager` role. Never use in production or staging. Set to `false` for real auth — requires `KEYCLOAK_CLIENT_SECRET` in `vendor-onboarding/.env` (run `flowpilot-infra/scripts/keycloak/setup-m2m-client.ps1` first).
 
 ---
 ## Release History
