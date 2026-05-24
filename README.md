@@ -182,9 +182,11 @@ Agentic AI applied where determinism suffices produces unpredictable, ungovernab
 | [ADR-008](adr/ADR-008-vendor-onboarding-domain.md) | 🟠 Shared | Vendor onboarding as demonstration domain |
 | [ADR-009](adr/ADR-009-mock-mode.md) | 🟠 Shared | Mock mode for zero-friction demonstration |
 | [ADR-010](adr/ADR-010-structlog-json-logging.md) | 🟠 Shared | Structured JSON logging over traditional logging |
-| [ADR-011](adr/ADR-011-no-reranking-layer.md) | 🔵 RAG | No dedicated reranking layer at portfolio scope |
+| [ADR-011](adr/ADR-011-reranking-layer.md) | 🔵 RAG | No dedicated reranking layer at portfolio scope |
 | [ADR-012](adr/ADR-012-keycloak-identity-provider.md) | 🟠 Shared | Keycloak as identity provider |
-| [ADR-013](adr/ADR-013-azure-service-bus-ingestion-queue.md) | 🔵 RAG | Azure Service Bus as async ingestion queue — production-ready by design |
+| [ADR-013](adr/ADR-013-event-feed-polling-over-sse.md) | 🟡 Boundary | Event feed via UI polling over SSE |
+| [ADR-014](adr/ADR-014-azure-service-bus-ingestion-queue.md) | 🔵 RAG | Azure Service Bus as async ingestion queue — production-ready by design |
+| [ADR-015](adr/ADR-015-langgraph-state-machine-over-multi-agent.md) | 🟣 Agentic AI | LangGraph state machine over autonomous multi-agent orchestration |
 
 ---
 
@@ -377,7 +379,7 @@ cd flowpilot-ui && npm run dev                       # Terminal 3 → http://loc
 
 | Release | What it demonstrates |
 |---|---|
-| **v1.2-knowledge-base** *(planned)* | Async ingestion queue (Azure Service Bus, ADR-013), vendor registry, re-assessment, duplicate validation, Document Management scene, 13 ADRs |
+| **v1.2-knowledge-base** *(planned)* | Async ingestion queue (Azure Service Bus, ADR-014), vendor registry, re-assessment, duplicate validation, Document Management scene, 15 ADRs |
 | **v1.1-authentication-ui** | Keycloak OIDC, React UI 8 scenes, real audit trail (11 events), ADR-012 |
 | **v1.0-final** | Complete platform, all ADRs, C4 diagrams, governance model |
 | **v0.3-iteration-2** | Operational resilience, AI governance, observability complete |
