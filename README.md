@@ -28,41 +28,10 @@
 
 ## Live Demo — Full User Journey
 
-The screenshots below show the complete end-to-end flow across both user roles. All data is live — real Keycloak JWT tokens, real LangGraph agent execution, real audit events from the API.
+https://github.com/nitindra-soekhai/flowpilot-docs/raw/main/docs/demo/FlowPilotDemo.mp4
 
-### Step 1 — Keycloak OIDC Login (sarah.chen · procurement_manager)
-![Keycloak Login sarah.chen](docs/images/screenshots/01-keycloak-login-sarah.png)
-> Keycloak 24 OIDC Authorization Code flow. JWT issued on sign-in, attached as Bearer token to all subsequent API calls. See ADR-012.
-
-### Step 2 — New Vendor Request Form
-![Vendor Form](docs/images/screenshots/02-vendor-form.png)
-> `POST /workflows/` with Bearer token → LangGraph state machine starts → `workflow_id` and `trace_id` generated.
-
-### Step 3 — Security Findings (AI-generated, policy-grounded)
-![Security Findings](docs/images/screenshots/03-security-findings.png)
-> LangGraph `assess_risk` node calls OpenAI GPT-4o with retrieved policy chunks. Findings grounded in real policy references (SEC-101, SEC-103, RISK-301). Confidence scores reflect RAG retrieval quality.
-
-![Security Findings — Action Required](docs/images/screenshots/04-security-findings-action.png)
-> Findings routed to security approval queue. Human review required — this is the HITL gate (ADR-004).
-
-### Step 4 — Account Switch to michael.davidson (security_approver)
-![Keycloak Login michael.davidson](docs/images/screenshots/05-keycloak-login-michael.png)
-> New JWT with `security_approver` role. Approval queue pre-loads the correct workflow.
-
-### Step 5 — Approval Queue (HITL Gate)
-![Approval Queue](docs/images/screenshots/06-approval-queue.png)
-> Decision submitted via `POST /workflows/{id}/approve` with Bearer token. RBAC enforced: only `security_approver` reaches this endpoint.
-
-### Step 6 — Workflow Complete
-![Workflow Complete](docs/images/screenshots/07-workflow-complete.png)
-> Traditional process: 45–60 days. FlowPilot: ~15 minutes. The agent executed autonomously; a human made the final call.
-
-### Step 7 — Audit Trail (11 real events, trace_id correlated)
-![Audit Trail](docs/images/screenshots/08-audit-trail.png)
-> Every event carries `trace_id`, `service` tag (`rag` / `workflow` / `security`), actor, and CET timestamp.
-
-![Audit Trail Event Log](docs/images/screenshots/09-audit-trail-events.png)
-> `workflow.created` → `rag.query.initiated` → `rag.query.completed` → `security.analysis.started` — all correlated by the same `trace_id`.
+> Full walkthrough: OPERATIONAL homepage → vendor intake → RAG policy retrieval →
+> AI security analysis → human approval gate → audit trail
 
 ---
 
