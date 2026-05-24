@@ -32,7 +32,7 @@ https://github.com/user-attachments/assets/65257e9f-424f-4336-924a-80757e46adcb
 
 ## Live Demo — Full User Journey
 
-https://github.com/nitindra-soekhai/flowpilot-docs/raw/main/docs/demo/FlowPilotDemo.mp4
+https://github.com/user-attachments/assets/0c64a28c-d791-4e06-a34f-9164110f6d29 
 
 > Full walkthrough: OPERATIONAL homepage → vendor intake → RAG policy retrieval →
 > AI security analysis → human approval gate → audit trail
