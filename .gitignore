@@ -3,3 +3,4 @@
 .env.production
 *.pem
 *.key
+.claude/settings.local.json

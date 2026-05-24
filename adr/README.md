@@ -21,3 +21,4 @@ All ADRs follow the same structure: **Context → Decision → Alternatives Cons
 | [ADR-013](./ADR-013-event-feed-polling-over-sse.md) | Event Feed Implementation: UI Polling over SSE | Accepted |
 | [ADR-014](./ADR-014-azure-service-bus-ingestion-queue.md) | Azure Service Bus as Async Ingestion Queue | Accepted — production path |
 | [ADR-015](./ADR-015-langgraph-state-machine-over-multi-agent.md) | LangGraph State Machine over Autonomous Multi-Agent Orchestration | Accepted |
+| [ADR-016](./ADR-016-secrets-management-azure-key-vault.md) | Secrets Management: Azure Key Vault via Managed Identity | Accepted |
