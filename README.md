@@ -1,6 +1,6 @@
 
 
-https://github.com/user-attachments/assets/65257e9f-424f-4336-924a-80757e46adcb
+[https://github.com/user-attachments/assets/65257e9f-424f-4336-924a-80757e46adcb](https://github.com/user-attachments/assets/d576ca27-7c77-4140-9f39-2641ebefee1c)
 
 # FlowPilot — Enterprise AI Orchestration Platform
 
@@ -32,7 +32,7 @@ https://github.com/user-attachments/assets/65257e9f-424f-4336-924a-80757e46adcb
 
 ## Live Demo — Full User Journey
 
-https://github.com/user-attachments/assets/0c64a28c-d791-4e06-a34f-9164110f6d29 
+https://github.com/user-attachments/assets/d576ca27-7c77-4140-9f39-2641ebefee1c 
 
 > Full walkthrough: OPERATIONAL homepage → vendor intake → RAG policy retrieval →
 > AI security analysis → human approval gate → audit trail
