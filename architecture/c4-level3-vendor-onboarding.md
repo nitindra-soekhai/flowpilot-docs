@@ -4,6 +4,7 @@
 flowchart TD
     subgraph VO ["flowpilot-vendor-onboarding · FastAPI · :8001"]
         TM("TraceMiddleware")
+        RBAC["RBACDependency\n(FastAPI Depends())\nRS256 via Keycloak JWKS"]
         AC["WorkflowController\n(POST /workflows → 201)"]
         EC["EventController\n(GET /workflows/{id}/events)"]
         LG["LangGraphOrchestrator\n(synchronous — _drain_graph)"]
@@ -14,7 +15,8 @@ flowchart TD
         DMH["DegradedModeHandler"]
     end
 
-    TM --> AC & EC
+    TM --> RBAC
+    RBAC --> AC & EC
     AC --> LG
     EC --> WSR
     LG --> PRT & RAT & HG
@@ -42,6 +44,7 @@ flowchart TD
 | Component | Responsibility |
 |---|---|
 | TraceMiddleware | Injects trace ID; propagates user_context through graph |
+| RBACDependency | FastAPI Depends() — decodes JWT RS256 via Keycloak JWKS; filters system roles; validates role → permission mapping; writes audit row |
 | WorkflowController | Handles POST /workflows — validates input, runs graph synchronously, returns 201 |
 | EventController | Handles GET /workflows/{id}/events — returns events ordered by id ASC; supports since_event_id filter |
 | LangGraphOrchestrator | Stateful 4-node agent graph: collect → retrieve → assess → approve (synchronous via _drain_graph) |

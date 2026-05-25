@@ -6,22 +6,29 @@ flowchart TD
         RS["rag-service\nFastAPI · LangChain · :8000"]
         VO["vendor-onboarding\nFastAPI · LangGraph · :8001"]
         QD["qdrant\nVector store · :6333"]
+        KC["keycloak\nOIDC · :8080\nrealm: flowpilot"]
+        UI["flowpilot-ui\nVite + React 18 · :3000"]
         SV[("shared volume\nSQLite · bind mount")]
-        NET(["flowpilot-net\nbridge network"])
-        RS & VO & QD & SV --- NET
+        NET(["flowpilot-rag-service_flowpilot-net\nbridge network (Docker auto-prefixed)"])
+        RS & VO & QD & KC & SV --- NET
+        UI -->|"OIDC + API calls"| NET
     end
 
-    subgraph AZURE ["Azure · reference target"]
-        subgraph AKS ["AKS cluster · Kubernetes · autoscale"]
+    subgraph AZURE ["Azure · reference target (Container Apps preferred — see ADR-016)"]
+        subgraph AKS ["Azure Container Apps / AKS · autoscale"]
             RSP["rag-service pod · :8000"]
             VOP["vendor-onboarding pod · :8001"]
         end
         ACR["Azure Container Registry\nDocker image store"]
         AIS["Azure AI Search\nreplaces Qdrant in prod"]
-        AKV["Azure Key Vault\nsecrets management"]
+        AKV["Azure Key Vault\nsecrets management — ADR-016"]
+        ASB["Azure Service Bus\nasync ingestion queue — ADR-014"]
+        AKC["Azure-hosted Keycloak\nOIDC · ADR-012"]
         ACR -->|pull image| AKS
         AKS --> AIS
         AKS --> AKV
+        AKS --> ASB
+        AKS --> AKC
     end
 ```
 
@@ -29,11 +36,13 @@ flowchart TD
 
 | Concern | Docker local | Azure reference |
 |---|---|---|
-| Orchestration | docker-compose | AKS (Kubernetes) |
+| Orchestration | docker-compose | Azure Container Apps (ADR-016) |
 | Vector store | Qdrant container | Azure AI Search |
-| Secrets | `.env` file | Azure Key Vault |
+| Secrets | `.env` file | Azure Key Vault via Managed Identity (ADR-016) |
+| Auth | Keycloak :8080 (Docker) | Azure-hosted Keycloak (ADR-012) |
 | Image registry | local build | Azure Container Registry |
-| Scaling | single instance | pod autoscale |
+| Ingestion queue | FastAPI BackgroundTasks | Azure Service Bus (ADR-014) |
+| Scaling | single instance | Container Apps autoscale |
 | SQLite | bind mount volume | Azure Files or Postgres (TBD) |
 
 ## Azure Migration Prerequisites

@@ -31,7 +31,7 @@ flowchart TD
     A["HTTP Request"] --> B
 
     subgraph MW ["flowpilot-platform · JWT Middleware"]
-        B["Decode JWT · extract roles"] --> C{"Permission check\nroute × role matrix"}
+        B["Decode JWT RS256 via Keycloak JWKS · extract realm_access.roles\nskip system roles (offline_access etc.)"] --> C{"Permission check\nroute × role matrix"}
     end
 
     C -->|denied| D["403 Forbidden · immediate"]
@@ -56,6 +56,6 @@ flowchart TD
 | Agent permission inheritance via user_context | ✓ | |
 | Audit log on every 403 | ✓ | |
 | User management UI | | ✓ |
-| Token issuance and login flow | | ✓ |
+| Keycloak OIDC login flow (Authorization Code) | ✓ | |
 
-> Hardcoded JWTs per test persona for portfolio scope. Production integrates with Azure AD.
+> Authentication: Keycloak 24 OIDC — Authorization Code flow for React UI, JWKS endpoint for JWT validation in both backend services. Users: sarah.chen (procurement_manager), michael.davidson (security_approver). Passwords managed via Keycloak realm import (flowpilot-realm.json). See ADR-012.

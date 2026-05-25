@@ -14,13 +14,13 @@ C4Component
     Container_Boundary(vo, "flowpilot-vendor-onboarding") {
 
         Component(trace_mw, "Trace Middleware", "Starlette BaseHTTPMiddleware", "Generates X-Trace-ID per request. Propagates upstream. Attaches to request.state.")
-        Component(rbac, "RBAC Dependency", "FastAPI Depends()", "Decodes JWT HS256. Validates role → permission mapping. Writes audit row on every access attempt.")
-        Component(router, "Workflows Router", "FastAPI APIRouter", "5 endpoints: create, read, decide, policy, events. Orchestrates graph invocation and finalize calls.")
+        Component(rbac, "RBAC Dependency", "FastAPI Depends()", "Decodes JWT RS256 via Keycloak JWKS endpoint. Filters system roles. Validates role → permission mapping. Writes audit row on every access attempt.")
+        Component(router, "Workflows Router", "FastAPI APIRouter", "Endpoints: POST /workflows/, GET /workflows/{id}, POST /workflows/{id}/decisions, GET /workflows/{id}/policy, GET /workflows/{id}/events. Orchestrates graph invocation and finalize calls.")
 
         Component(graph, "LangGraph StateGraph", "LangGraph 0.2.x", "Compiled state machine: initiate → collect_documents → security_review → pending_approval → END")
         Component(initiate, "initiate_node", "Async node", "Retrieves policy via RAG client. Persists initial workflow record.")
         Component(collect, "collect_documents_node", "Async node", "Validates submitted documents vs required list. Flags missing — does not block.")
-        Component(security, "security_review_node", "Async node", "Mock security assessment. Adds elevated-access finding for production requests.")
+        Component(security, "security_review_node", "Async node", "AI-generated security findings via OpenAI structured outputs (findings_generator.py). Pydantic Finding model. Sandwich-pattern prompt injection mitigation. Fallback to hardcoded findings on OpenAI failure.")
         Component(approval, "pending_approval_node", "Async node", "HITL gate. Saves PENDING_APPROVAL to SQLite. Graph ends here.")
         Component(finalize, "finalize_node", "Async function", "Called directly by router on HITL decision. Sets APPROVED or REJECTED.")
 

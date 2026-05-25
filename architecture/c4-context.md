@@ -18,18 +18,26 @@ C4Context
     System_Ext(openai, "OpenAI API", "LLM inference (GPT-4o) and embeddings (text-embedding-3-large)")
     System_Ext(qdrant, "Qdrant", "Dense + sparse vector storage for policy knowledge base")
     System_Ext(github, "GitHub", "Source control, CI/CD, tagged releases")
+    System_Ext(keycloak, "Keycloak 24", "OIDC identity provider — Authorization Code flow for UI, JWKS for JWT validation. Realm: flowpilot. See ADR-012.")
 
-    Rel(procurement, vo, "Initiates onboarding, queries policy", "HTTPS REST / JSON")
-    Rel(approver, vo, "Approves or rejects workflows", "HTTPS REST / JSON")
+    Rel(procurement, vo, "Initiates onboarding, queries policy via React UI", "HTTPS REST / JSON")
+    Rel(approver, vo, "Approves or rejects workflows via React UI", "HTTPS REST / JSON")
     Rel(admin, rag, "Uploads policy PDFs, monitors retrieval quality", "HTTPS REST / JSON")
     Rel(vo, rag, "Retrieves policy guidance per workflow step", "HTTPS REST — X-Trace-ID propagated")
     Rel(rag, openai, "Embeds documents and queries, generates grounded responses", "HTTPS")
     Rel(rag, qdrant, "Stores and retrieves policy embeddings", "gRPC")
+    Rel(procurement, keycloak, "Authenticates via OIDC login", "HTTPS")
+    Rel(approver, keycloak, "Authenticates via OIDC login", "HTTPS")
+    Rel(vo, keycloak, "Validates JWT via JWKS endpoint", "HTTPS")
+    Rel(rag, keycloak, "Validates M2M JWT via JWKS endpoint", "HTTPS")
 ```
 
 ---
 
 ## Key context decisions
+
+**React UI**
+The React UI (Vite + React 18 + Tailwind, port 3000) is the user-facing client for both roles. It authenticates via Keycloak Authorization Code flow (keycloak-js). Session expiry triggers auto-redirect to Keycloak login. The UI is not shown as a separate internal System in this context diagram as it is a thin client — all business logic lives in the two internal services.
 
 **Why two internal systems?**
 The RAG service is domain-agnostic — it answers policy questions for any domain. The vendor onboarding service consumes it. Keeping them separate means a future HR onboarding or procurement domain can use the same RAG service without modification. See [ADR-007](../adr/ADR-007-retrieval-separated-from-orchestration.md).

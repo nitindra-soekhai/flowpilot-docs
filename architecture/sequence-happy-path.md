@@ -41,8 +41,10 @@ sequenceDiagram
     Note over Graph: Node 3 — security_review_node
     Graph->>RAG: POST /query {query: "security requirements cloud vendors"}
     RAG-->>Graph: Security policy guidance
-    Graph->>Graph: Generate mock security findings
-    Graph->>DB: update_workflow(SECURITY_REVIEW, findings=[...])
+    Graph->>OpenAI: findings_generator — structured outputs (Pydantic Finding model)
+    OpenAI-->>Graph: AI-generated security findings (JSON)
+    Graph->>Graph: Validate findings via Pydantic · apply sandwich-pattern injection mitigation
+    Graph->>DB: update_workflow(SECURITY_REVIEW, findings=[AI-generated findings])
 
     Note over Graph: Node 4 — pending_approval_node (HITL gate)
     Graph->>DB: update_workflow(PENDING_APPROVAL) + add_event(ROUTED_FOR_APPROVAL)

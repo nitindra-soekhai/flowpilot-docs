@@ -1,3 +1,7 @@
+> ⚠️ **Deprecated** — This is the original Day 0 conceptual sequence diagram. The current implementation sequence is in [`sequence-happy-path.md`](sequence-happy-path.md) which reflects the actual built system (Keycloak auth, `/workflows/` endpoints, Option B polling, v1.6 AI findings). This file is retained for historical reference only.
+
+---
+
 # Happy Path Sequence Diagram
 
 Acme Cloud Services onboarding — trace_id: `fp-2026-a4b2`

@@ -9,6 +9,24 @@ erDiagram
         string tier
         string status
     }
+    VENDOR_REGISTRY {
+        uuid id PK
+        uuid vendor_id FK
+        string registry_status
+        string approved_by
+        string approved_at
+        string last_assessed_at
+        int assessment_count
+        string notes
+    }
+    REASSESSMENT {
+        uuid id PK
+        uuid vendor_id FK
+        uuid triggered_by FK
+        string reason
+        string status
+        string created_at
+    }
     ASSESSMENT {
         uuid id PK
         uuid vendor_id FK
@@ -57,6 +75,9 @@ erDiagram
     }
 
     VENDOR ||--o{ ASSESSMENT : "assessed via"
+    VENDOR ||--|| VENDOR_REGISTRY : "registered in"
+    VENDOR ||--o{ REASSESSMENT : "re-assessed via"
+    USER ||--o{ REASSESSMENT : "triggers"
     ASSESSMENT ||--o{ APPROVAL_REQUEST : "requires"
     ASSESSMENT ||--o{ AUDIT_EVENT : "generates"
     ASSESSMENT ||--|| WORKFLOW_STATE : "tracked by"
@@ -66,6 +87,10 @@ erDiagram
 ```
 
 ## Notes
+
+- `VENDOR_REGISTRY` tracks approved vendors post-onboarding — added in v1.2. Prevents duplicate onboarding of already-registered vendors.
+- `REASSESSMENT` supports periodic re-evaluation of existing vendors — triggers a new assessment workflow without creating a new vendor record.
+
 
 - `AUDIT_EVENT.trace_id` is the cross-cutting correlation key — every entity that participates in a workflow produces audit events tied to the same trace ID
 - `WORKFLOW_STATE` is 1:1 with `ASSESSMENT` — one state machine per assessment run

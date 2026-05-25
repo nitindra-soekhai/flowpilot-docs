@@ -67,6 +67,8 @@ erDiagram
     users ||--o{ approval_requests : ""
 ```
 
+> **Note:** The schema above is the **conceptual domain model**. The implemented SQLite schema in `flowpilot-vendor-onboarding` uses: `workflows`, `workflow_events`, `audit_log`, `dead_letter`. These map to the conceptual entities but are optimised for the LangGraph state machine pattern rather than normalised relational design.
+
 ### Type notes
 
 - All IDs are `TEXT` UUID v4 — SQLite has no native UUID type
@@ -100,7 +102,7 @@ erDiagram
 |---|---|
 | Dense vector size | 1536 dimensions |
 | Distance metric | Cosine |
-| Embedding model | `text-embedding-3-small` (OpenAI) |
+| Embedding model | `text-embedding-3-large` (OpenAI) |
 | Sparse vector index | `sparse` |
 | Sparse modifier | `idf` (BM25 scoring) |
 
