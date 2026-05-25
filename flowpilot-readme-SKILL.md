@@ -27,17 +27,17 @@ Current canonical order (do NOT reorder without explicit instruction):
 5. `## Why This Architecture?`
 6. `## Enterprise Concerns`
 7. `## Why Agents Are Not Always the Answer`
-8. `## Architecture`
-9. `## Deployment Architecture`
-10. `## FlowPilot in the Azure AI Hub/Spoke Ecosystem`
-11. `## Mapping to Azure AI Reference Architecture`
-12. `## Governance Boundaries`
-13. `## Traceability — Every AI Decision Is Reconstructable`
-14. `## Retrieval Scoring & Confidence`
-15. `## Operational Resilience`
-16. `## Production Readiness`
-17. `## Known Limitations & Tradeoffs`
-18. `## Architecture Decision Records`
+8. `## Architecture Decision Records`
+9. `## Architecture`
+10. `## Deployment Architecture`
+11. `## FlowPilot in the Azure AI Hub/Spoke Ecosystem`
+12. `## Mapping to Azure AI Reference Architecture`
+13. `## Governance Boundaries`
+14. `## Traceability — Every AI Decision Is Reconstructable`
+15. `## Retrieval Scoring & Confidence`
+16. `## Operational Resilience`
+17. `## Production Readiness`
+18. `## Known Limitations & Tradeoffs`
 19. `## Engineering Proof`
 20. `## Repository Map`
 21. `## Stack`
@@ -171,7 +171,7 @@ The section must also contain: "This is governed collaboration, not autonomous A
 
 ## 9. ADR Table Rules
 
-- 12 ADRs listed (ADR-001 through ADR-012)
+- 16 ADRs listed (ADR-001 through ADR-016)
 - Each row has: link, layer emoji, decision text
 - Layer emojis: 🔵 RAG, 🟣 Agentic AI, 🟠 Shared, 🟡 Boundary
 - Do NOT add, remove, or reorder ADR rows without explicit instruction
@@ -179,12 +179,12 @@ The section must also contain: "This is governed collaboration, not autonomous A
 
 ---
 
-## 10. Screenshot Steps (Live Demo section)
+## 10. Live Demo Section
 
-- 9 screenshot steps (Step 1 through Step 7, with two images in Step 3 and Step 7)
-- Each step has: heading, image reference, blockquote description
-- Image paths are under `docs/images/screenshots/` — do NOT change filenames
-- Do NOT add or remove steps without explicit instruction
+- Demo is a **video** (GitHub-hosted mp4), not screenshot steps
+- Reference format: raw GitHub asset URL on its own line below the `## Live Demo — Full User Journey` heading
+- Do NOT add screenshot steps or image references — screenshots have been replaced by the video
+- Do NOT change the video URL without explicit instruction
 
 ---
 

@@ -14,7 +14,7 @@ https://github.com/user-attachments/assets/80416da0-ceea-40c3-8b68-329f73e1433d
 |---|---|---|
 | `flowpilot-rag-service` | RAG — hybrid retrieval, grounding pipeline | [![CI](https://github.com/nitindra-soekhai/flowpilot-rag-service/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/nitindra-soekhai/flowpilot-rag-service/actions) |
 | `flowpilot-vendor-onboarding` | Agentic AI — LangGraph, HITL, SQLite state | [![CI](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding/actions) |
-| `flowpilot-docs` | Architecture — 12 ADRs, diagrams, governance | [![Docs](https://img.shields.io/badge/docs-live-brightgreen)](https://github.com/nitindra-soekhai/flowpilot-docs) |
+| `flowpilot-docs` | Architecture — 16 ADRs, diagrams, governance | [![Docs](https://img.shields.io/badge/docs-live-brightgreen)](https://github.com/nitindra-soekhai/flowpilot-docs) |
 
 ---
 
@@ -157,10 +157,10 @@ Agentic AI applied where determinism suffices produces unpredictable, ungovernab
 | [ADR-010](adr/ADR-010-structlog-json-logging.md) | 🟠 Shared | Structured JSON logging over traditional logging |
 | [ADR-011](adr/ADR-011-reranking-layer.md) | 🔵 RAG | No dedicated reranking layer at portfolio scope |
 | [ADR-012](adr/ADR-012-keycloak-identity-provider.md) | 🟠 Shared | Keycloak as identity provider |
-| [ADR-013](adr/ADR-013-event-feed-polling-over-sse.md) | 🟡 Boundary | Event feed via UI polling over SSE |
+| [ADR-013](adr/ADR-013-event-feed-polling-over-sse.md) | 🟠 Shared | Event feed via UI polling over SSE |
 | [ADR-014](adr/ADR-014-azure-service-bus-ingestion-queue.md) | 🔵 RAG | Azure Service Bus as async ingestion queue — production-ready by design |
 | [ADR-015](adr/ADR-015-langgraph-state-machine-over-multi-agent.md) | 🟣 Agentic AI | LangGraph state machine over autonomous multi-agent orchestration |
-| [ADR-016](adr/ADR-016-secrets-management-azure-key-vault.md) | 🟢 Shared | Azure Key Vault via Managed Identity — secrets management |
+| [ADR-016](adr/ADR-016-secrets-management-azure-key-vault.md) | 🟠 Shared | Azure Key Vault via Managed Identity — secrets management |
 
 ---
 
@@ -271,7 +271,7 @@ FlowPilot is designed to operate as a **spoke** in the Microsoft Azure AI Foundr
 | Idempotency guarantees | ✅ Implemented |
 | Workflow checkpoint recovery | ✅ Implemented |
 | Structured JSON logging (structlog) | ✅ Implemented |
-| Policy document management UI | 🔑 In progress |
+| Policy document management UI | ✅ Implemented |
 | Evaluation pipeline (retrieval quality, LLM output) | 📊 Planned |
 | Multi-tenancy isolation | 📊 Planned |
 | Operational SLIs/SLOs | 📊 Planned |
@@ -355,8 +355,12 @@ cd flowpilot-ui && npm run dev                       # Terminal 3 → http://loc
 
 | Release | What it demonstrates |
 |---|---|
-| **v1.2-knowledge-base** *(planned)* | Async ingestion queue (Azure Service Bus, ADR-014), vendor registry, re-assessment, duplicate validation, Document Management scene, 15 ADRs |
-| **v1.1-authentication-ui** | Keycloak OIDC, React UI 8 scenes, real audit trail (11 events), ADR-012 |
+| **v1.6** *(pending tag)* | Real AI security findings (OpenAI structured outputs, Pydantic), M2M Keycloak fix, startup orchestration, ADR-016, 16 ADRs |
+| **v1.5-operational-homepage** | FLOWPILOT OPERATIONAL control plane homepage, 5-tile layout, ADR-015, positioning statement |
+| **v1.4-dark-ui** | Dark RT token system, 6 scenes migrated, build hook, NaN% guard |
+| **v1.3-option-b-polling** | Live event polling (Option B), security fixes, RAG networking hardening, ADR-013 |
+| **v1.2-knowledge-base** | Async ingestion queue (Azure Service Bus, ADR-014), vendor registry, re-assessment, duplicate validation, Document Management scene, 16 ADRs |
+| **v1.1-authentication-ui** | Keycloak OIDC, React UI 9 scenes, real audit trail (11 events), ADR-012 |
 | **v1.0-final** | Complete platform, all ADRs, C4 diagrams, governance model |
 | **v0.3-iteration-2** | Operational resilience, AI governance, observability complete |
 | **v0.2-iteration-1** | Hybrid retrieval, agentic workflow, HITL approval |
