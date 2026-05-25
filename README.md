@@ -39,29 +39,37 @@ https://github.com/user-attachments/assets/80416da0-ceea-40c3-8b68-329f73e1433d
 
 ---
 
-## AI Development Team
+## AI Specialist Collaboration Model
 
-FlowPilot explores governed multi-agent collaboration patterns for enterprise AI delivery, operations, onboarding workflows, governance, and platform engineering.
+FlowPilot explores governed AI-assisted collaboration patterns for enterprise AI delivery, operational workflows, governance orchestration, and platform engineering.
 
-13 specialist agents operate under Nitindra Soekhai's direction with Claude as coordinator — orchestrating, reviewing, and gating all output before it surfaces. Nothing reaches Nitindra without passing the internal review gate. This is governed collaboration, not autonomous AI.
+The model is based on specialized AI delivery responsibilities operating under human governance authority. Claude acts as orchestration coordinator — managing context routing, task segmentation, and specialist collaboration flows across engineering, quality, operations, data, and architecture domains.
+
+Rather than relying on a single long-running generalized AI session, FlowPilot intentionally separates responsibilities into specialized collaboration contexts to improve consistency, delivery quality, governance control, and architectural precision during complex implementation cycles.
+
+All output remains human-governed and passes through internal coordination and review gates before implementation decisions are finalized.
 
 ![AI Development Team](docs/images/agent-team-org.jpg)
 
-| Domain | Agent | Responsibility |
+### Specialist Collaboration Responsibilities
+
+| Domain | Specialist Context | Responsibility |
 |---|---|---|
-| Engineering | Enterprise Retrieval agent | flowpilot-rag-service — grounding, retrieval, optimization |
-| Engineering | Vendor Onboarding agent | flowpilot-vendor-onboarding — orchestration, approvals, workflow |
-| Quality | Security agent | RBAC, OIDC, OWASP, GDPR, ISO 27001 |
-| Quality | QA agent | pytest, Playwright, coverage gates |
-| Operations | Infra agent | Azure reference architecture, Terraform readiness |
-| Operations | DevOps agent | GitHub Actions, CI/CD, Docker build pipeline |
-| Platform | Frontend Experience agent | React UI — components, scenes, UX |
-| Platform | Middleware agent | Messaging, middleware, integration patterns |
-| Data | Database agent | DBA, schema, migrations |
-| Data | MLOps agent | Retrieval metrics, LLM ops, token costs |
-| Insight | Analyst agent | Functional scope, business requirements |
-| Insight | Architecture Knowledge agent | ADRs, C4 diagrams, architecture documentation |
-| Insight | Analytics agent | Dashboards, boards, statistics |
+| Engineering | Enterprise Retrieval | Grounding, retrieval optimization, RAG architecture |
+| Engineering | Vendor Onboarding | Workflow orchestration, approvals, onboarding flows |
+| Quality | Security | RBAC, OIDC, OWASP, GDPR, ISO 27001 |
+| Quality | QA | pytest, Playwright, validation, coverage gates |
+| Operations | Infrastructure | Azure architecture, Terraform readiness |
+| Operations | DevOps | CI/CD, Docker pipelines, GitHub Actions |
+| Platform | Frontend Experience | React UI, runtime scenes, UX consistency |
+| Platform | Middleware | Messaging, integration, orchestration patterns |
+| Data | Database | Schema design, migrations, DBA concerns |
+| Data | MLOps | Retrieval metrics, token costs, LLM operations |
+| Insight | Analyst | Functional scope, operational requirements |
+| Insight | Architecture Knowledge | ADRs, C4 models, architecture documentation |
+| Insight | Analytics | Dashboards, telemetry, operational statistics |
+
+This is governed AI-assisted enterprise delivery — not autonomous AI.
 
 ---
 
