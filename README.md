@@ -176,6 +176,24 @@ Agentic AI applied where determinism suffices produces unpredictable, ungovernab
 
 ![FlowPilot Stack to Repository Mapping](docs/images/fig2-repo-mapping.png)
 
+### Diagram Index — Source Files
+
+| Diagram | Level | Source |
+|---|---|---|
+| System Context | C4 Level 1 | [c4-context.md](architecture/c4-context.md) |
+| Container Diagram | C4 Level 2 | [c4-container.md](architecture/c4-container.md) |
+| Component — vendor-onboarding | C4 Level 3 | [c4-component.md](architecture/c4-component.md) |
+| Component — rag-service | C4 Level 3 | [c4-level3-rag-service.md](architecture/c4-level3-rag-service.md) |
+| Component — vendor-onboarding (flowchart) | C4 Level 3 | [c4-level3-vendor-onboarding.md](architecture/c4-level3-vendor-onboarding.md) |
+| Deployment — Docker + Azure | Infrastructure | [deployment.md](architecture/deployment.md) |
+| Happy Path | Sequence | [sequence-happy-path.md](architecture/sequence-happy-path.md) |
+| Failure Paths | Sequence | [sequence-failure-paths.md](architecture/sequence-failure-paths.md) |
+| Approval Timeout | Sequence | [sequence-approval-timeout.md](architecture/sequence-approval-timeout.md) |
+| Data Model | Physical schema | [data-model.md](architecture/data-model.md) |
+| Information Model | Domain entities | [information-model.md](architecture/information-model.md) |
+| RBAC | Role matrix | [rbac.md](architecture/rbac.md) |
+| Domain Boundaries | Boundary map | [domain-boundaries.md](architecture/domain-boundaries.md) |
+
 ---
 
 ## Deployment Architecture
