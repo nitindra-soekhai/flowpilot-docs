@@ -49,7 +49,7 @@ Rather than relying on a single long-running generalized AI session, FlowPilot i
 
 All output remains human-governed and passes through internal coordination and review gates before implementation decisions are finalized.
 
-![AI Development Team](docs/images/agent-team-org.jpg)
+![AI Development Team](docs/images/agent-team-org.svg)
 
 ### Specialist Collaboration Responsibilities
 
