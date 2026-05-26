@@ -12,7 +12,6 @@ The platform supports workflows ranging from simple internal requests and subscr
 
 AI handles the groundwork. Humans make the decisions. Every step remains traceable and auditable.
 
-This portfolio demonstrates **enterprise vendor onboarding** as the reference use case. The platform is designed to handle any workflow — from subscription handling to procurement, compliance, and operational delivery. AI handles the coordination. Humans make the decisions. Every action is traceable and auditable.
 
 
 **The vendor onboarding workflow is the demonstration domain. FlowPilot is the platform.**
