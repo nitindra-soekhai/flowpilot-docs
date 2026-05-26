@@ -2,7 +2,7 @@
 
 **Status:** Accepted — May 2026
 
-**Layer:** 🟢 Shared — all services
+**Layer:** 🟠 Shared — all services
 
 **Author:** Nitindra Soekhai, NSCS B.V.
 **Relates to:** ADR-006 (FastAPI over Spring Boot), ADR-007 (Retrieval separated from orchestration), ADR-016 (Azure Key Vault)
