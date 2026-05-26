@@ -6,7 +6,10 @@ https://github.com/user-attachments/assets/80416da0-ceea-40c3-8b68-329f73e1433d
 
 **Built by Nitindra Soekhai · NSCS B.V.**
 
-> An enterprise AI orchestration platform demonstrating senior AI architect capabilities — designed as a reusable platform, demonstrated through a vendor onboarding use case. RAG architecture, agentic orchestration, human-in-the-loop governance, operational resilience, and full observability.
+> FlowPilot is an AI platform that helps any organisation — from small business to enterprise — manage complex workflows with built-in governance and human oversight.
+
+This portfolio demonstrates **enterprise vendor onboarding** as the reference use case. The platform is designed to handle any workflow — from subscription handling to procurement, compliance, and operational delivery. AI handles the coordination. Humans make the decisions. Every action is traceable and auditable.
+
 
 **The vendor onboarding workflow is the demonstration domain. FlowPilot is the platform.**
 
