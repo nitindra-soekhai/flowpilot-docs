@@ -14,7 +14,7 @@ https://github.com/user-attachments/assets/80416da0-ceea-40c3-8b68-329f73e1433d
 |---|---|---|
 | `flowpilot-rag-service` | RAG — hybrid retrieval, grounding pipeline | [![CI](https://github.com/nitindra-soekhai/flowpilot-rag-service/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/nitindra-soekhai/flowpilot-rag-service/actions) |
 | `flowpilot-vendor-onboarding` | Agentic AI — LangGraph, HITL, SQLite state | [![CI](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding/actions) |
-| `flowpilot-docs` | Architecture — 16 ADRs, diagrams, governance | [![Docs](https://img.shields.io/badge/docs-live-brightgreen)](https://github.com/nitindra-soekhai/flowpilot-docs) |
+| `flowpilot-docs` | Architecture — 17 ADRs, diagrams, governance | [![Docs](https://img.shields.io/badge/docs-live-brightgreen)](https://github.com/nitindra-soekhai/flowpilot-docs) |
 
 ---
 
@@ -169,6 +169,7 @@ Agentic AI applied where determinism suffices produces unpredictable, ungovernab
 | [ADR-014](adr/ADR-014-azure-service-bus-ingestion-queue.md) | 🔵 RAG | Azure Service Bus as async ingestion queue — production-ready by design |
 | [ADR-015](adr/ADR-015-langgraph-state-machine-over-multi-agent.md) | 🟣 Agentic AI | LangGraph state machine over autonomous multi-agent orchestration |
 | [ADR-016](adr/ADR-016-secrets-management-azure-key-vault.md) | 🟠 Shared | Azure Key Vault via Managed Identity — secrets management |
+| [ADR-017](adr/ADR-017-polyrepo-strategy.md) | 🟠 Shared | Polyrepo strategy over monorepo — flowpilot-docs as central skills source of truth |
 
 ---
 
@@ -336,7 +337,7 @@ FlowPilot is designed to operate as a **spoke** in the Microsoft Azure AI Foundr
 
 | Repository | Purpose |
 |---|---|
-| **flowpilot-docs** ← *you are here* | Architecture docs: C4 diagrams, 16 ADRs, governance model, sequence diagrams |
+| **flowpilot-docs** ← *you are here* | Architecture docs: C4 diagrams, 17 ADRs, governance model, sequence diagrams |
 | [flowpilot-rag-service](https://github.com/nitindra-soekhai/flowpilot-rag-service) | RAG: async PDF ingestion (Azure Service Bus), hybrid retrieval, grounding pipeline, guardrails |
 | [flowpilot-vendor-onboarding](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding) | Agentic AI: LangGraph state machine, HITL approval gate, vendor registry, re-assessment |
 | [flowpilot-ui](https://github.com/nitindra-soekhai/flowpilot-ui) | React 18 UI: 8 scenes + Vendor Registry + Document Management, Keycloak OIDC, audit trail |
@@ -381,7 +382,7 @@ cd flowpilot-ui && npm run dev                       # Terminal 3 → http://loc
 
 | Release | What it demonstrates |
 |---|---|
-| **v1.6** *(pending tag)* | Real AI security findings (OpenAI structured outputs, Pydantic), M2M Keycloak fix, startup orchestration, ADR-016, 16 ADRs |
+| **v1.6** *(pending tag)* | Real AI security findings (OpenAI structured outputs, Pydantic), M2M Keycloak fix, startup orchestration, ADR-016, ADR-017, 17 ADRs |
 | **v1.5-operational-homepage** | FLOWPILOT OPERATIONAL control plane homepage, 5-tile layout, ADR-015, positioning statement |
 | **v1.4-dark-ui** | Dark RT token system, 6 scenes migrated, build hook, NaN% guard |
 | **v1.3-option-b-polling** | Live event polling (Option B), security fixes, RAG networking hardening, ADR-013 |
