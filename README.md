@@ -1,5 +1,4 @@
-
-https://github.com/user-attachments/assets/e88281c4-907b-459f-856a-9b38a171d1cb
+https://github.com/user-attachments/assets/d367c471-57a0-4dde-94e9-45de8484d60d
 
 
 # FlowPilot — Enterprise AI Orchestration Platform
@@ -38,7 +37,7 @@ AI handles the groundwork. Humans make the decisions. Every step remains traceab
 
 ## Live Demo — Full User Journey
 
-https://github.com/user-attachments/assets/e88281c4-907b-459f-856a-9b38a171d1cb
+https://github.com/user-attachments/assets/d367c471-57a0-4dde-94e9-45de8484d60d
 
 > Full walkthrough: OPERATIONAL homepage → vendor intake → RAG policy retrieval →
 > AI security analysis → human approval gate → audit trail
