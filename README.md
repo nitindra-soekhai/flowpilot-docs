@@ -1,6 +1,6 @@
 
 
-https://github.com/user-attachments/assets/80416da0-ceea-40c3-8b68-329f73e1433d
+https://github.com/user-attachments/assets/e88281c4-907b-459f-856a-9b38a171d1cb
 
 # FlowPilot — Enterprise AI Orchestration Platform
 
