@@ -22,3 +22,8 @@ All ADRs follow the same structure: **Context → Decision → Alternatives Cons
 | [ADR-014](./ADR-014-azure-service-bus-ingestion-queue.md) | Azure Service Bus as Async Ingestion Queue | Accepted — production path |
 | [ADR-015](./ADR-015-langgraph-state-machine-over-multi-agent.md) | LangGraph State Machine over Autonomous Multi-Agent Orchestration | Accepted |
 | [ADR-016](./ADR-016-secrets-management-azure-key-vault.md) | Secrets Management: Azure Key Vault via Managed Identity | Accepted |
+| [ADR-017](./ADR-017-polyrepo-strategy.md) | Polyrepo strategy over monorepo — flowpilot-docs as central skills source of truth | Accepted |
+| [ADR-018](./ADR-018-demo-to-production-adapter-pattern.md) | Demo-to-production adapter pattern for infrastructure components | Accepted |
+| [ADR-019](./ADR-019-opswat-document-scanning.md) | OPSWAT MetaDefender Cloud API for document virus scanning | Accepted |
+| [ADR-020](./ADR-020-internal-notification-system.md) | SQLite-backed internal notification bell; email delivery deferred | Accepted |
+| [ADR-021](./ADR-021-configurable-workflow-schema.md) | Configurable workflow schema — runtime configuration via SQLite config store | Accepted — implementation Day 11 |

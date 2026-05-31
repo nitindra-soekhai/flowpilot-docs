@@ -58,4 +58,4 @@ flowchart TD
 | User management UI | | ✓ |
 | Keycloak OIDC login flow (Authorization Code) | ✓ | |
 
-> Authentication: Keycloak 24 OIDC — Authorization Code flow for React UI, JWKS endpoint for JWT validation in both backend services. Users: sarah.chen (procurement_manager), michael.davidson (security_approver). Passwords managed via Keycloak realm import (flowpilot-realm.json). See ADR-012.
+> Authentication: Keycloak 24 OIDC — Authorization Code flow for React UI, JWKS endpoint for JWT validation in both backend services. Users: sarah.chen (procurement_manager), michael.davidson (security_approver), lisa.vandenberg (policy_manager). Passwords managed via Keycloak realm import (flowpilot-realm.json). See ADR-012.
