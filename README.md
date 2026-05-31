@@ -14,7 +14,7 @@ https://github.com/user-attachments/assets/e88281c4-907b-459f-856a-9b38a171d1cb
 |---|---|---|
 | `flowpilot-rag-service` | RAG — hybrid retrieval, grounding pipeline | [![CI](https://github.com/nitindra-soekhai/flowpilot-rag-service/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/nitindra-soekhai/flowpilot-rag-service/actions) |
 | `flowpilot-vendor-onboarding` | Agentic AI — LangGraph, HITL, SQLite state | [![CI](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding/actions) |
-| `flowpilot-docs` | Architecture — 20 ADRs, diagrams, governance | [![Docs](https://img.shields.io/badge/docs-live-brightgreen)](https://github.com/nitindra-soekhai/flowpilot-docs) |
+| `flowpilot-docs` | Architecture — 21 ADRs, diagrams, governance | [![Docs](https://img.shields.io/badge/docs-live-brightgreen)](https://github.com/nitindra-soekhai/flowpilot-docs) |
 
 ---
 
@@ -173,6 +173,7 @@ Agentic AI applied where determinism suffices produces unpredictable, ungovernab
 | [ADR-018](adr/ADR-018-demo-to-production-adapter-pattern.md) | 🟠 Shared | Demo-to-production adapter pattern for infrastructure components |
 | [ADR-019](adr/ADR-019-opswat-document-scanning.md) | 🟠 Shared | OPSWAT document scanning |
 | [ADR-020](adr/ADR-020-internal-notification-system.md) | 🟠 Shared | Internal notification system |
+| [ADR-021](adr/ADR-021-configurable-workflow-schema.md) | 🟡 Boundary | Configurable workflow schema — implementation Day 11 |
 
 ---
 
@@ -190,21 +191,23 @@ Agentic AI applied where determinism suffices produces unpredictable, ungovernab
 
 ### Diagram Index — Source Files
 
-| Diagram | Level | Source |
-|---|---|---|
-| System Context | C4 Level 1 | [c4-context.md](architecture/c4-context.md) |
-| Container Diagram | C4 Level 2 | [c4-container.md](architecture/c4-container.md) |
-| Component — vendor-onboarding | C4 Level 3 | [c4-component.md](architecture/c4-component.md) |
-| Component — rag-service | C4 Level 3 | [c4-level3-rag-service.md](architecture/c4-level3-rag-service.md) |
-| Component — vendor-onboarding (flowchart) | C4 Level 3 | [c4-level3-vendor-onboarding.md](architecture/c4-level3-vendor-onboarding.md) |
-| Deployment — Docker + Azure | Infrastructure | [deployment.md](architecture/deployment.md) |
-| Happy Path | Sequence | [sequence-happy-path.md](architecture/sequence-happy-path.md) |
-| Failure Paths | Sequence | [sequence-failure-paths.md](architecture/sequence-failure-paths.md) |
-| Approval Timeout | Sequence | [sequence-approval-timeout.md](architecture/sequence-approval-timeout.md) |
-| Data Model | Physical schema | [data-model.md](architecture/data-model.md) |
-| Information Model | Domain entities | [information-model.md](architecture/information-model.md) |
-| RBAC | Role matrix | [rbac.md](architecture/rbac.md) |
-| Domain Boundaries | Boundary map | [domain-boundaries.md](architecture/domain-boundaries.md) |
+| Diagram | Level | Source | ADR References |
+|---|---|---|---|
+| System Context | C4 Level 1 | [c4-context.md](architecture/c4-context.md) | ADR-012 |
+| Container Diagram | C4 Level 2 | [c4-container.md](architecture/c4-container.md) | ADR-005, ADR-013, ADR-014 |
+| Component — vendor-onboarding | C4 Level 3 | [c4-component.md](architecture/c4-component.md) | ADR-004, ADR-005 |
+| Component — rag-service | C4 Level 3 | [c4-level3-rag-service.md](architecture/c4-level3-rag-service.md) | ADR-002, ADR-014, ADR-018, ADR-019 |
+| Component — vendor-onboarding (flowchart) | C4 Level 3 | [c4-level3-vendor-onboarding.md](architecture/c4-level3-vendor-onboarding.md) | ADR-013, ADR-018, ADR-020 |
+| Deployment — Docker + Azure | Infrastructure | [deployment.md](architecture/deployment.md) | ADR-012, ADR-014, ADR-016, ADR-018, ADR-019 |
+| Happy Path | Sequence | [sequence-happy-path.md](architecture/sequence-happy-path.md) | ADR-013 |
+| Failure Paths | Sequence | [sequence-failure-paths.md](architecture/sequence-failure-paths.md) | ADR-004, ADR-005 |
+| Approval Timeout | Sequence | [sequence-approval-timeout.md](architecture/sequence-approval-timeout.md) | ADR-004 |
+| Data Model | Physical schema | [data-model.md](architecture/data-model.md) | ADR-005, ADR-021 |
+| Information Model | Domain entities | [information-model.md](architecture/information-model.md) | ADR-021 |
+| RBAC | Role matrix | [rbac.md](architecture/rbac.md) | ADR-010, ADR-012 |
+| Domain Boundaries | Boundary map | [domain-boundaries.md](architecture/domain-boundaries.md) | ADR-007, ADR-018, ADR-021 |
+
+> ⚠️ **Visual updates pending (v1.9):** Container Diagram (`c4-container.md`) and Component — vendor-onboarding flowchart (`c4-level3-vendor-onboarding.md`) do not yet show `VendorOverviewScene` or the `/vendors` route group. Update these diagrams when the v1.9 diagram refresh is scheduled.
 
 ---
 
@@ -302,6 +305,9 @@ FlowPilot is designed to operate as a **spoke** in the Microsoft Azure AI Foundr
 | Workflow checkpoint recovery | ✅ Implemented |
 | Structured JSON logging (structlog) | ✅ Implemented |
 | Policy document management UI | ✅ Implemented |
+| Vendor Registry CRUD (GET/POST/PUT/DELETE /vendors) | ✅ Implemented |
+| Role-aware action buttons (Delete=policy_manager, Update=procurement_manager) | ✅ Implemented |
+| 5-act automated E2E demo scenario (self-contained, SQLite seed) | ✅ Implemented |
 | Evaluation pipeline (retrieval quality, LLM output) | 📊 Planned |
 | Multi-tenancy isolation | 📊 Planned |
 | Operational SLIs/SLOs | 📊 Planned |
@@ -340,7 +346,7 @@ FlowPilot is designed to operate as a **spoke** in the Microsoft Azure AI Foundr
 
 | Repository | Purpose |
 |---|---|
-| **flowpilot-docs** ← *you are here* | Architecture docs: C4 diagrams, 20 ADRs, governance model, sequence diagrams |
+| **flowpilot-docs** ← *you are here* | Architecture docs: C4 diagrams, 21 ADRs, governance model, sequence diagrams |
 | [flowpilot-rag-service](https://github.com/nitindra-soekhai/flowpilot-rag-service) | RAG: async PDF ingestion (Azure Service Bus), hybrid retrieval, grounding pipeline, guardrails |
 | [flowpilot-vendor-onboarding](https://github.com/nitindra-soekhai/flowpilot-vendor-onboarding) | Agentic AI: LangGraph state machine, HITL approval gate, vendor registry, re-assessment |
 | [flowpilot-ui](https://github.com/nitindra-soekhai/flowpilot-ui) | React 18 UI: 8 scenes + Vendor Registry + Document Management, Keycloak OIDC, audit trail |
@@ -373,7 +379,7 @@ cd flowpilot-vendor-onboarding && docker compose up  # Terminal 2
 cd flowpilot-ui && npm run dev                       # Terminal 3 → http://localhost:3000
 ```
 
-**Login credentials:** `sarah.chen` (procurement_manager) · `michael.davidson` (security_approver)
+**Login credentials:** `sarah.chen` (procurement_manager) · `michael.davidson` (security_approver) · `lisa.vandenberg` (policy_manager)
 > Credentials available on request for evaluation purposes.
 
 `FP_MOCK_MODE=true` — no OpenAI key required. Full workflow, observability, and resilience demonstrable without API cost.
@@ -385,6 +391,8 @@ cd flowpilot-ui && npm run dev                       # Terminal 3 → http://loc
 
 | Release | What it demonstrates |
 |---|---|
+| **v1.9-vendor-registry** *(Day 10)* | Vendor CRUD API with full RBAC, VendorOverviewScene (table, StatusBadge, DeleteVendorModal), 5-act E2E demo scenario, workflow-progress redirect, View Vendor Registry button, 8 new governance skills, STATE.md per repo, ADR-021 |
+| **v1.8-admin-module** | Admin Document Upload module, OPSWAT MetaDefender virus scanning, SQLite notification bell, demo-to-production adapter pattern for all infra components, ADR-018, ADR-019, ADR-020 |
 | **v1.6** *(pending tag)* | Real AI security findings (OpenAI structured outputs, Pydantic), M2M Keycloak fix, startup orchestration, ADR-016, ADR-017, 17 ADRs |
 | **v1.5-operational-homepage** | FLOWPILOT OPERATIONAL control plane homepage, 5-tile layout, ADR-015, positioning statement |
 | **v1.4-dark-ui** | Dark RT token system, 6 scenes migrated, build hook, NaN% guard |

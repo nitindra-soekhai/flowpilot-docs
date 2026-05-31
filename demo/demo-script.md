@@ -202,6 +202,23 @@ sqlite3 flowpilot_workflows.db \
 
 ---
 
+## Iteration 4 — Vendor Registry (v1.9-vendor-registry)
+
+**Story:** Browse the full vendor registry, observe role-aware controls, delete a vendor as policy_manager, update as procurement_manager.
+
+**Login:** `lisa.vandenberg` (policy_manager) for delete actions · `sarah.chen` (procurement_manager) for update actions
+
+### Vendor Registry (lisa.vandenberg / policy_manager)
+
+1. Navigate to `/vendors` — full registry with status badges (Assessed = teal, Re-assessed = ↻, Pending Approval = amber)
+2. Delete a vendor — confirm modal appears, row disappears on confirmation
+3. Switch to `sarah.chen` (procurement_manager) — Update vendor triggers re-assessment workflow
+4. Observe role-aware buttons: Delete is visible only to policy_manager; Update is accessible to procurement_manager
+
+**Talking point:** RBAC bounds what each role can see and do — not just API-level but UI-level. A policy_manager JWT cannot trigger a workflow re-assessment; a procurement_manager JWT cannot delete a registry entry. Two separate role permissions, two separate action paths, enforced at both API and UI layers.
+
+---
+
 ## Closing points for an architecture interview
 
 1. **The HITL gate is structural, not policy.** The agent cannot hold a `security_approver` JWT. The state guard prevents decisions on non-PENDING_APPROVAL workflows. Two independent enforcement mechanisms.
