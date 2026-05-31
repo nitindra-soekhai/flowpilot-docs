@@ -1,14 +1,14 @@
+# FlowPilot Operational
 
+FlowPilot Operational is a governance-aware workflow platform for
+Human-in-the-Loop enterprise processes. It combines AI-assisted context
+enrichment, approval coordination, event tracking, findings management,
+and auditability within a standardized operational runtime.
 
-https://github.com/user-attachments/assets/e88281c4-907b-459f-856a-9b38a171d1cb
+The first implementation focuses on Enterprise Vendor Onboarding and
+serves as the foundation for future governance-driven workflow use cases.
 
-# FlowPilot — Enterprise AI Orchestration Platform
-
-**Built by Nitindra Soekhai · NSCS B.V.**
-
-> An enterprise AI orchestration platform demonstrating senior AI architect capabilities — designed as a reusable platform, demonstrated through a vendor onboarding use case. RAG architecture, agentic orchestration, human-in-the-loop governance, operational resilience, and full observability.
-
-**The vendor onboarding workflow is the demonstration domain. FlowPilot is the platform.**
+Built by Nitindra Soekhai · NSCS B.V.
 
 | Repository | Role | Build |
 |---|---|---|
