@@ -407,7 +407,5 @@ cd flowpilot-ui && npm run dev                       # Terminal 3 → http://loc
 ---
 
 
-*FlowPilot · NSCS B.V. · Built by Nitindra Soekhai · May 2026*
-*Copyright (c) 2026 Nitindra Soekhai.
-All rights reserved.
-No permission is granted to use, copy, modify, distribute, sublicense, or commercialize this software without explicit written permission.*
+*FlowPilot · NSCS B.V · Copyright (c) 2026 Nitindra Soekhai.*
+*All rights reserved. No permission is granted to use, copy, modify, distribute, sublicense, or commercialize this software without explicit written permission.*
